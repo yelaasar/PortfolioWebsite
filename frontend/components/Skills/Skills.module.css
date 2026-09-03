@@ -2,9 +2,13 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  /* Was `height`. The Experience timeline lands in this region in Phase 5 and
-     would overflow a fixed budget; renders identically while content fits. */
-  min-height: 90dvh;
+  /* Was `height: 90dvh`, then `min-height: 90dvh` on the assumption that the
+     Experience timeline would land in this section. It became its own section
+     instead, so that reason no longer holds — and min-height scales with the
+     viewport, so after the skills list was trimmed it reserved ~500px of dead
+     space on a tall monitor. Height now follows content, with the same
+     bottom margin Work and Experience use. */
+  margin-bottom: 10dvh;
 
   span {
     display: flex;
