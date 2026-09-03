@@ -67,6 +67,59 @@
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
   }
 
+  input[type='submit']:disabled {
+    opacity: 0.6;
+    cursor: progress;
+    transform: none;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Off-screen rather than display:none, because a hidden field is skipped by
+     some bots — and `position: absolute` is doing two more jobs: it takes the
+     trap out of flow so `form { gap: 30px }` adds no phantom gap, and it beats
+     `.container input:not([type='submit'])` (0,2,1), which a bare `.honeypot`
+     class (0,1,0) would lose to. */
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 30px;
+  }
+
+  .error {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Cannot inherit `.container p`, which is var(--secondary-color) #a52a2a on
+     #141414 — about 3.0:1, below WCAG AA's 4.5:1 for body text. #ff6b6b is
+     ~5.9:1. Specificity: `.container .fieldError` (0,2,0) beats
+     `.container p` (0,1,1), so order does not matter here. */
+  .error p,
+  .fieldError {
+    color: #ff6b6b;
+  }
+
+  .fieldError {
+    font-size: 15px;
+    margin-top: 8px;
+  }
+
+  .fallback a {
+    color: var(--text-color);
+    text-decoration: underline;
+  }
+
   @media (width >= 800px) {
     textarea,
     input:not([type='submit']) {
