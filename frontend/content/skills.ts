@@ -1,53 +1,37 @@
 import type { SkillGroup } from './types'
 
 /**
- * Grouped as on the consultant profile, which leads with the commercial stack
- * rather than the academic one. The previous list was ML-first (PyTorch, NumPy,
- * Pandas, Scikit-Learn) — accurate for the dissertation, misleading about what
- * the client work actually is.
+ * Deliberately short. Two rules decide what earns a line:
+ *
+ * 1. No table stakes. Git, Jira and "agile delivery" are assumed of any
+ *    engineer; listing them adds length and subtracts credibility.
+ * 2. Nothing implied by something else already here. TypeScript implies
+ *    JavaScript, Flutter implies Dart, and Python + PyTorch imply NumPy,
+ *    Pandas and Matplotlib.
+ *
+ * Specific versions and services live in the case studies, where they are
+ * attached to something that was actually built — "AWS" here, "Lambda, EC2 and
+ * RDS" on the page describing the platform that runs on them.
  */
 export const skillGroups: SkillGroup[] = [
   {
     label: 'Languages',
-    items: ['C#', 'TypeScript', 'JavaScript', 'Python', 'Dart', 'SQL'],
+    items: ['C#', 'TypeScript', 'Python', 'SQL'],
   },
   {
     label: 'Frameworks',
-    items: [
-      '.NET / ASP.NET MVC',
-      'Next.js',
-      'React',
-      'Django',
-      'Flutter',
-      'Tailwind CSS',
-    ],
+    items: ['.NET / ASP.NET MVC', 'Next.js', 'React', 'Django', 'Flutter'],
   },
   {
-    label: 'Data & Cloud',
-    items: [
-      'PostgreSQL',
-      'Supabase',
-      'AWS (Lambda, EC2, RDS, CDK)',
-      'Azure',
-      'GCP',
-      'Vercel',
-      'RESTful APIs',
-      'Serverless & edge functions',
-    ],
+    label: 'Cloud & Data',
+    items: ['AWS', 'Azure', 'GCP', 'PostgreSQL'],
   },
   {
-    label: 'Tools & Practices',
-    items: [
-      'Git',
-      'CI/CD pipelines',
-      'Jira',
-      'Agile delivery',
-      'AI-assisted development',
-      'UiPath',
-    ],
+    label: 'Practices',
+    items: ['CI/CD', 'Serverless & infrastructure as code', 'AI-assisted development'],
   },
   {
     label: 'Machine Learning',
-    items: ['PyTorch', 'Transformers', 'NumPy', 'Pandas', 'Scikit-Learn', 'Matplotlib'],
+    items: ['PyTorch', 'Transformers'],
   },
 ]
