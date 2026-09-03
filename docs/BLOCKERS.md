@@ -9,65 +9,23 @@ the obvious cause.
 
 Audited against reality on **2026-09-03**: live site probed, files checked on
 disk and in git, PR state read from GitHub, local `.env.local` checked for which
-variable *names* are set (values never read or logged).
+variable *names* are set (values never read or logged). Re-checked same day
+after PR #2 merged — Discord delivery confirmed live via direct probe.
 
 ---
 
 # Open
 
-## 1. PR #2 is unmerged, so the contact form is dead in production
+## 1. Email is half-configured — needs a Resend key to actually send
 
-**Status: live defect.** `https://yelaasar.vercel.app/api/contact` currently
-returns **500** on every submission.
-
-`DISCORD_WEBHOOK_URL` is set on Vercel, but `main` has no
-`frontend/lib/notify.ts` — the Discord code lives on the `contact-notifications`
-branch in [PR #2](https://github.com/yelaasar/PortfolioWebsite/pull/2), not
-merged. The deployed route is still the original email-only one, which checks
-`RESEND_API_KEY` and 500s when it's absent. **Nothing reads the Discord variable
-you set — it has no effect until this merges.**
-
-Visitors aren't shown a broken page: the form catches the failure, keeps
-everything they typed, and offers an "email me directly" mailto link. But no
-enquiry reaches you right now.
-
-**To clear:**
-
-1. Merge PR #2.
-2. Vercel redeploys automatically on merge, which is also when the build first
-   reads `DISCORD_WEBHOOK_URL` — env vars are baked in at build time, so this
-   only works because the merge triggers a fresh build.
-3. Re-run the probe below. It should return `{"ok":true}` **and** post into your
-   Discord channel.
-
-```bash
-curl -s -w '\n[%{http_code}]\n' -X POST https://yelaasar.vercel.app/api/contact \
-  -H 'Content-Type: application/json' \
-  -d "{\"name\":\"Deploy check\",\"email\":\"check@example.com\",\"message\":\"Verifying the deployed notification code.\",\"startedAt\":$(( $(date +%s) * 1000 - 10000 ))}"
-```
-
-| Response | Meaning |
-|---|---|
-| `500 server_error` | No channel configured *in the deployed code* — where it is now |
-| `502 send_failed` | Discord is wired but the webhook URL is wrong or revoked |
-| `200 {"ok":true}` | Working. Check the Discord channel. |
-
-> `startedAt` is backdated ten seconds deliberately: the route silently drops
-> anything submitted under three seconds after the form loads, as a bot filter.
-> A probe without it returns a misleading `200` having sent nothing.
-
----
-
-## 2. Email is half-configured — needs a Resend key to actually send
-
-**Not urgent — Discord alone is enough once #1 clears.** But worth knowing the
-exact state so it isn't confusing later.
+**Not urgent — Discord is already live**, confirmed by direct probe (see
+Resolved, below). But worth knowing the exact state so it isn't confusing later.
 
 `frontend/.env.local` currently has `CONTACT_TO_EMAIL` and `CONTACT_FROM_EMAIL`
 set, but **`RESEND_API_KEY` is empty**. `notifyEmail()` requires all three to
-attempt a send (see PR #2) — with the key missing it returns `null`, meaning
-"not configured," same as if none were set. So today, even after PR #2 merges,
-only Discord will actually deliver; the email half is inert until a key exists.
+attempt a send — with the key missing it returns `null`, meaning "not
+configured," same as if none were set. Right now only Discord actually
+delivers; the email half is inert until a key exists.
 
 **To activate it later:** get a free key at
 [resend.com/api-keys](https://resend.com/api-keys) — sign up with the address in
@@ -81,7 +39,7 @@ redeploy.
 
 ---
 
-## 3. Case-study metrics — **you own this**
+## 2. Case-study metrics — **you own this**
 
 The experience section and all six case studies are written and live. The
 homepage has no placeholders. What's missing is **the numbers**.
@@ -110,6 +68,19 @@ follows the CV. Worth making them agree before a prospect reads both.
 ---
 
 # Resolved
+
+## ~~PR #2 unmerged / contact form dead in production~~
+
+**Resolved 2026-09-03.** PR #2 merged (`bea2120`), Vercel redeployed, and the
+live endpoint was probed directly:
+
+```bash
+curl -s -w '\n[%{http_code}]\n' -X POST https://yelaasar.vercel.app/api/contact \
+  -H 'Content-Type: application/json' \
+  -d "{\"name\":\"Deploy check\",\"email\":\"check@example.com\",\"message\":\"Verifying the deployed notification code.\",\"startedAt\":$(( $(date +%s) * 1000 - 10000 ))}"
+```
+
+Returned `200 {"ok":true}`. Discord delivery is live.
 
 ## ~~Vercel deployment returned 404~~
 
