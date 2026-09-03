@@ -1,0 +1,127 @@
+.page {
+  /* The old rule was height: 99vh / width: 98vw, which ignored the body's own
+     margin and overflowed. Filling the dynamic viewport instead also survives
+     mobile browser chrome sliding in and out. */
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  box-sizing: border-box;
+}
+
+/* The engine sizes itself from this element, so it must have a real height of
+   its own rather than being sized by the canvas it contains. */
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #fefefeaf;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* Transparent to the pointer: a click meant for a target must reach the canvas
+   underneath. Interactive children opt back in individually. */
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.statusBar {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.75rem 1rem;
+  font-family: Courier;
+  color: var(--text-color);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+.statValue {
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Warns that the round is nearly over without moving anything on screen. */
+.urgent {
+  color: #ff6b6b;
+}
+
+.panel {
+  pointer-events: auto;
+  margin: auto;
+  padding: 2rem 2.5rem;
+  background-color: rgba(20, 20, 20, 0.88);
+  border: 1px solid #fefefeaf;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  /* The shared CTA is a fixed 7rem, which clips a label like "Play again". */
+  button {
+    width: auto;
+    padding: 0 1.5rem;
+  }
+}
+
+.panel h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.panel p {
+  margin: 0;
+  max-width: 24rem;
+  line-height: 1.5;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.5rem 2rem;
+  margin: 0.5rem 0;
+  font-family: Courier;
+  color: var(--text-color);
+  text-align: left;
+}
+
+.results dt {
+  opacity: 0.7;
+}
+
+.results dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.loading {
+  margin: auto;
+  font-family: Courier;
+  color: var(--text-color);
+  opacity: 0.7;
+}
