@@ -19,10 +19,11 @@
      clipped both ends, leaving the left link unreachable. Wrapping keeps
      every link on screen at every width.
      `gap` rather than the old `margin: 3rem`: adjacent horizontal margins do
-     not collapse, so 3rem+3rem == the 6rem gap here, and the bar is
-     pixel-identical at desktop widths. */
+     not collapse, so 3rem+3rem == 6rem, which is what the bar used to have.
+     Reduced to 3rem when Experience and Work made it five links instead of
+     four — at 6rem the row no longer fits 1400px and wrapped on desktop. */
   flex-wrap: wrap;
-  gap: 0 6rem;
+  gap: 0 3rem;
 
   border: 1px solid var(--secondary-color);
   background-color: var(--secondary-color);

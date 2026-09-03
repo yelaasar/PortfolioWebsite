@@ -23,16 +23,25 @@
     font-size: 20px;
   }
 
-  /* Nested rather than top-level: a bare `hr` selector is not a "pure"
-     CSS Module selector and hard-fails the build.
-     `margin: 1 auto` is invalid (unitless 1) so the browser drops it and the
-     hr keeps its UA default margin — left as-is deliberately, since
-     "correcting" it to 1rem would visibly move the rules. */
-  hr {
-    width: 300px;
-    margin: 1 auto;
-    border: 1px solid var(--secondary-color);
-  }
+  /* The `hr` rules that used to live here are gone with the separators
+     themselves — the groups carry labels now. That also retires the
+     `margin: 1 auto` landmine (unitless 1, silently dropped by every
+     browser) that had to be preserved verbatim while the element existed. */
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.groupLabel {
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: var(--secondary-color);
+  letter-spacing: 0.1em;
+  margin: 0.5rem 0;
 }
 
 .skillContainer {
@@ -55,9 +64,4 @@
     }
   }
 
-  .container {
-    hr {
-      width: 500px;
-    }
-  }
 }

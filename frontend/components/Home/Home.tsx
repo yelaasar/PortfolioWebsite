@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { site } from '@/content/site'
 import styles from './Home.module.css'
 import cta from '@/components/ui/CTAButton.module.css'
 import gitIcon from '@/assets/github_icon.svg'
@@ -20,31 +21,32 @@ export default function Home() {
         />
       </div>
       <div className={styles.info}>
+        {/* Split on the first space to keep the original two-line stack
+            (given name above family name) now that the name comes from data
+            rather than a hardcoded <br />. */}
         <h1 className="sectionTitle">
-          Youssef
+          {site.name.split(' ')[0]}
           <br />
-          El Aasar
+          {site.name.split(' ').slice(1).join(' ')}
         </h1>
-        <h2>Masters Computer Science Student</h2>
+        <h2>{site.title}</h2>
         <span>
           <a
-            href="https://www.linkedin.com/in/youssefelaasar"
+            href={site.socials.linkedin}
             target="_blank"
             rel="noopener noreferrer"
           >
             <Image src={linkedinIcon} alt="LinkedIn" />
           </a>
           <a
-            href="https://www.github.com/theglassofwater"
+            href={site.socials.github}
             target="_blank"
             rel="noopener noreferrer"
           >
             <Image src={gitIcon} alt="GitHub" />
           </a>
         </span>
-        <p className={styles.description}>
-          Curious programmer with a passion for learning and problem solving.
-        </p>
+        <p className={styles.description}>{site.tagline}</p>
         {/* Was a <button> nested inside an <a>, which is invalid HTML. */}
         <a
           className={`${cta.cta} ${styles.cv}`}

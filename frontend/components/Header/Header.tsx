@@ -5,7 +5,8 @@ import styles from './Header.module.css'
 // a server component and makes the links focusable and keyboard-operable.
 const links = [
   { href: '#home', label: 'Home' },
-  { href: '#projects', label: 'Projects' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#work', label: 'Work' },
   { href: '#skills', label: 'Skills' },
   { href: '#contact', label: 'Contact' },
 ]

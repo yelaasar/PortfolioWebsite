@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
       { source: '/PortfolioWebsite', destination: '/', permanent: true },
       { source: '/PortfolioWebsite/music-generator', destination: '/work/music-generator', permanent: true },
       { source: '/PortfolioWebsite/aim-trainer', destination: '/labs/aim-trainer', permanent: true },
+      // The Projects section became Work in Phase 5.
+      { source: '/projects', destination: '/#work', permanent: true },
     ]
   },
 }

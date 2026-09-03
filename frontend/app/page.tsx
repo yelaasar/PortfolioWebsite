@@ -1,6 +1,7 @@
 import Header from '@/components/Header/Header'
 import Home from '@/components/Home/Home'
-import Projects from '@/components/Projects/Projects'
+import Experience from '@/components/Experience/Experience'
+import Work from '@/components/Work/Work'
 import Skills from '@/components/Skills/Skills'
 import ContactForm from '@/components/Contact/ContactForm'
 import Footer from '@/components/Footer/Footer'
@@ -10,7 +11,8 @@ export default function Page() {
     <>
       <Header />
       <Home />
-      <Projects />
+      <Experience />
+      <Work />
       <Skills />
       <ContactForm />
       <Footer />
