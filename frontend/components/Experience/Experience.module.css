@@ -1,0 +1,122 @@
+/* Every selector is nested inside a local class: a bare element selector at
+   the top level is not "pure" and hard-fails the Lightning CSS build. */
+.container {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 10dvh;
+}
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  align-self: center;
+  width: 100%;
+  max-width: 70ch;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.entry {
+  border-left: 2px solid var(--secondary-color);
+  padding-left: 1.25rem;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.role {
+  font-family: monospace;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.org {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  color: var(--secondary-color);
+  margin: 0;
+}
+
+.kind {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--secondary-color);
+  border-radius: 1rem;
+  padding: 0.1rem 0.6rem;
+  color: var(--text-color);
+}
+
+.period {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 0;
+}
+
+.summary {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  margin: 0.75rem 0 0;
+}
+
+.highlights {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0;
+}
+
+.stackItem {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  border: 1px solid #444;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.5rem;
+}
+
+.caseStudyLink {
+  margin: 0.75rem 0 0;
+
+  a {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Deliberately loud. Unfilled content should be uncomfortable to look at, not
+   quietly invisible. */
+.todo {
+  background-color: #4a3a00;
+  color: #ffd24a;
+  padding: 0 0.25rem;
+  border-radius: 0.2rem;
+}

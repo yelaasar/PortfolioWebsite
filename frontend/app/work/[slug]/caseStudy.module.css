@@ -1,0 +1,129 @@
+/* Every element selector is nested inside a local class — a bare one at the
+   top level is not "pure" and hard-fails the Lightning CSS build. */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 6dvh;
+}
+
+.body {
+  width: 100%;
+  max-width: 70ch;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin: 0 0 2rem;
+  padding: 1rem 1.25rem;
+  border-left: 2px solid var(--secondary-color);
+
+  dt {
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+  }
+
+  dd {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    margin: 0.2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+}
+
+.stackItem {
+  font-size: 0.75rem;
+  border: 1px solid #444;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.5rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-family: monospace;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    margin: 0 0 0.75rem;
+  }
+
+  ul {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    padding-left: 1.2rem;
+    margin: 0;
+  }
+
+  li {
+    margin-bottom: 0.4rem;
+  }
+
+  a {
+    color: var(--secondary-color);
+  }
+}
+
+.audio {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.pianoRoll {
+  width: 100%;
+  height: auto;
+}
+
+.cover {
+  width: 50%;
+  /* next/image emits intrinsic width+height; without this the CSS width alone
+     distorts the aspect ratio. */
+  height: auto;
+  border-radius: 40px;
+  margin-top: 2rem;
+}
+
+.back {
+  margin-top: 2.5rem;
+
+  a {
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--secondary-color);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.todo {
+  background-color: #4a3a00;
+  color: #ffd24a;
+  padding: 0 0.25rem;
+  border-radius: 0.2rem;
+}
+
+@media (width >= 800px) {
+  .meta {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

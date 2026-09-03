@@ -1,0 +1,67 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  /* Was `height`. The Experience timeline lands in this region in Phase 5 and
+     would overflow a fixed budget; renders identically while content fits. */
+  min-height: 90dvh;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  img {
+    width: 30px;
+    /* next/image emits intrinsic width+height attributes; without this the
+       CSS width alone distorts the aspect ratio. */
+    height: auto;
+  }
+
+  p {
+    font-size: 20px;
+  }
+
+  /* The `hr` rules that used to live here are gone with the separators
+     themselves — the groups carry labels now. That also retires the
+     `margin: 1 auto` landmine (unitless 1, silently dropped by every
+     browser) that had to be preserved verbatim while the element existed. */
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.groupLabel {
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: var(--secondary-color);
+  letter-spacing: 0.1em;
+  margin: 0.5rem 0;
+}
+
+.skillContainer {
+  display: flex;
+  justify-content: space-evenly;
+  align-self: center;
+  flex-wrap: wrap;
+  row-gap: 0px;
+  column-gap: 30px;
+  max-width: 60ch;
+}
+
+@media (width >= 800px) {
+  .skillContainer {
+    max-width: 70ch;
+    gap: 30px;
+
+    p {
+      font-size: 20px;
+    }
+  }
+
+}

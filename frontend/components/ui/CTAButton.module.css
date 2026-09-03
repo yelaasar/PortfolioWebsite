@@ -1,0 +1,34 @@
+/* The site's canonical call-to-action: a red pill with a lifted shadow.
+   Previously copy-pasted into Home, Contact and MusicGenerator, each with
+   slightly different values. This is the single definition. */
+.cta {
+  /* Works on <a> as well as <button>, so an anchor is never wrapped in a
+     button (or vice versa) just to get this look. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 4rem;
+  height: 2rem;
+  width: 7rem;
+
+  font-size: 1.2rem;
+  font-family: Courier;
+
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 200ms ease-in-out, transform 200ms ease-in-out;
+}
+
+.cta:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+.cta:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
+}
