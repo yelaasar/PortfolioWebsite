@@ -1,0 +1,53 @@
+.container {
+  margin: 0;
+  /* Was a fixed `height`. The links wrap on narrow viewports (see below), and
+     a fixed height would let them spill outside the red bar. At >=962px the
+     content is shorter than 15dvh, so the bar is the same height as before. */
+  min-height: 15dvh;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+
+  /* The links used to be centred by the default margins of a wrapping <h1>.
+     Now that the <h1> is gone (it also collided with Home's), centre them
+     explicitly rather than relying on that. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* The four links need ~962px on one line. They already overflowed below
+     that width; centring them turned a right-side overflow into one that
+     clipped both ends, leaving the left link unreachable. Wrapping keeps
+     every link on screen at every width.
+     `gap` rather than the old `margin: 3rem`: adjacent horizontal margins do
+     not collapse, so 3rem+3rem == the 6rem gap here, and the bar is
+     pixel-identical at desktop widths. */
+  flex-wrap: wrap;
+  gap: 0 6rem;
+
+  border: 1px solid var(--secondary-color);
+  background-color: var(--secondary-color);
+  color: var(--background-color);
+
+  a {
+    color: var(--background-color);
+    font-size: 5dvh;
+    font-family: monospace;
+    /* Inherited from the old <h1>; set explicitly now. */
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: 0.2s;
+  }
+
+  a:hover {
+    transform: scale(1.05);
+    color: var(--text-color);
+    cursor: pointer;
+  }
+}
+
+@media (width < 800px) {
+  .container {
+    gap: 0 2rem;
+  }
+}

@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  /* Was `height`. See Skills.module.css — the CV/Experience content grows
+     here in Phase 5. Renders identically while content fits. */
+  min-height: 81dvh;
+
+  span {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+
+    a {
+      img {
+        width: 4rem;
+        height: 4rem;
+      }
+    }
+  }
+}
+
+.profilePicture {
+  width: 200px;
+  /* next/image emits intrinsic width+height; without this the CSS width
+     alone distorts the aspect ratio. */
+  height: auto;
+}
+
+.description {
+  max-width: 45ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  margin-right: 0;
+}
+
+/* The CTA is a flex item of .info, so without this it stretches to the full
+   column width instead of staying a pill. (It used to be a <button> centred
+   by the inherited text-align.) */
+.cv {
+  align-self: center;
+}
+
+@media (width >= 800px) {
+  .container {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-evenly;
+
+    .profilePicture {
+      max-width: 450px;
+      width: 450px;
+    }
+  }
+}
+
+@media (width >= 1400px) {
+  .container {
+    .profilePicture {
+      max-width: 600px;
+      width: 600px;
+    }
+  }
+}

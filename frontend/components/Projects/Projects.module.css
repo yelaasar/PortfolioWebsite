@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 10dvh;
+
+  img {
+    width: 50%;
+    /* next/image emits intrinsic width+height; without this the CSS width
+       alone distorts the aspect ratio. */
+    height: auto;
+    align-self: center;
+    background-color: var(--background-color);
+    border-radius: 40px;
+  }
+
+  a {
+    width: fit-content;
+    text-decoration: none;
+    /* Was #222 — near-invisible on #141414, but cosmetically dead: the anchor
+       only contains an <h2> and an <img>, and the global h2 rule beats
+       inheritance. Corrected anyway so it can't bite later. */
+    color: var(--text-color);
+    transition: transform 200ms ease-in-out;
+  }
+
+  a:hover {
+    transform: scale(1.05);
+  }
+}
+
+.projectsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  div {
+    display: flex;
+
+    p {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--secondary-color);
+    }
+  }
+}
+
+@media (width >= 800px) {
+  .projectsContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: space-evenly;
+    padding: 0 30px;
+  }
+}

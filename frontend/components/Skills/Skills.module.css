@@ -1,0 +1,63 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  /* Was `height`. The Experience timeline lands in this region in Phase 5 and
+     would overflow a fixed budget; renders identically while content fits. */
+  min-height: 90dvh;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  img {
+    width: 30px;
+    /* next/image emits intrinsic width+height attributes; without this the
+       CSS width alone distorts the aspect ratio. */
+    height: auto;
+  }
+
+  p {
+    font-size: 20px;
+  }
+
+  /* Nested rather than top-level: a bare `hr` selector is not a "pure"
+     CSS Module selector and hard-fails the build.
+     `margin: 1 auto` is invalid (unitless 1) so the browser drops it and the
+     hr keeps its UA default margin — left as-is deliberately, since
+     "correcting" it to 1rem would visibly move the rules. */
+  hr {
+    width: 300px;
+    margin: 1 auto;
+    border: 1px solid var(--secondary-color);
+  }
+}
+
+.skillContainer {
+  display: flex;
+  justify-content: space-evenly;
+  align-self: center;
+  flex-wrap: wrap;
+  row-gap: 0px;
+  column-gap: 30px;
+  max-width: 60ch;
+}
+
+@media (width >= 800px) {
+  .skillContainer {
+    max-width: 70ch;
+    gap: 30px;
+
+    p {
+      font-size: 20px;
+    }
+  }
+
+  .container {
+    hr {
+      width: 500px;
+    }
+  }
+}

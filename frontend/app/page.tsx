@@ -1,14 +1,19 @@
-// Placeholder for Phase 1 — verifies the scaffold, the merged globals.css and
-// the design tokens render correctly before any component is ported.
-// Phase 2 replaces this with the composed single-page CV.
+import Header from '@/components/Header/Header'
+import Home from '@/components/Home/Home'
+import Projects from '@/components/Projects/Projects'
+import Skills from '@/components/Skills/Skills'
+import ContactForm from '@/components/Contact/ContactForm'
+import Footer from '@/components/Footer/Footer'
+
 export default function Page() {
   return (
-    <main>
-      <h1 className="sectionTitle">Scaffold</h1>
-      <h1>Heading one</h1>
-      <h2>Heading two</h2>
-      <h3>Heading three</h3>
-      <p>Body copy in Courier at 0.9rem.</p>
-    </main>
+    <>
+      <Header />
+      <Home />
+      <Projects />
+      <Skills />
+      <ContactForm />
+      <Footer />
+    </>
   )
 }
