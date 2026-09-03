@@ -58,26 +58,53 @@ both restrictions — worth doing after the first real lead, not before.
 
 ---
 
-## 3. No Vercel project — **you own this**
+## 3. Vercel deploy returns 404 — **you own this**
 
-**Blocks:** Phase 3, which is the only step that changes what's live. Everything
-else can be built and merged without it.
+**Symptom:** `yelaasar.vercel.app` returns Vercel's own `404: NOT_FOUND`
+(`x-vercel-error: NOT_FOUND`), not the site's styled 404 page.
 
-**To clear:** import `yelaasar/PortfolioWebsite` at <https://vercel.com/new>, then:
+**Diagnosis (2026-09-03).** Probe both kinds of URL:
 
-| Setting | Value | Why |
-|---|---|---|
-| **Root Directory** | **`frontend`** | The Next app is not at the repo root. Miss this and the build fails outright. |
-| Production branch | `main` | |
-| Framework preset | Next.js | Should autodetect. |
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://yelaasar.vercel.app/CV.pdf      # 200
+curl -s -o /dev/null -w '%{http_code}\n' https://yelaasar.vercel.app/sitemap.xml # 404
+```
 
-Rename the project so the URL is a clean `yelaasar.vercel.app`, then set
-`site.url` in `frontend/content/site.ts` to match — `metadataBase` and
-`sitemap.ts` both read it, so social-preview and canonical URLs are wrong until
-it's right.
+Everything that physically exists in `frontend/public/` serves 200. Every route
+the Next build *generates* — `/`, `/sitemap.xml`, `/robots.txt`,
+`/manifest.webmanifest`, `/opengraph-image`, `/work/*`, `/api/contact` — 404s.
 
-**Verify:** view-source on the deployed page shows a real `<title>` and
-`<meta name="description">`, not CRA boilerplate.
+So **`frontend/public/` is being published as a plain static folder and the Next
+build output is not being used.** Root Directory is already correct: `/CV.pdf`
+could not resolve otherwise. This is Framework Preset / Output Directory.
+
+The usual cause: the project was imported while the repo root had no
+`package.json` — true of `main`, which is still the pre-migration tree — so
+framework detection fell back to "Other" and pinned Output Directory to
+`public`. Setting Root Directory afterwards does **not** re-run detection.
+
+**To clear** — Settings → Build and Deployment:
+
+| Setting | Value |
+|---|---|
+| Framework Preset | **Next.js** ← the actual fix |
+| Root Directory | `frontend` |
+| Build Command | clear override (`next build`) |
+| Output Directory | **clear override** (likely set to `public`) |
+| Install Command | clear override |
+
+Then Deployments → ⋯ → Redeploy with **"Use existing build cache" unchecked**.
+
+Also check Settings → Git → **Production Branch**. Since `frontend/public/` files
+are serving, it is not building `main` (which has no `frontend/`). Merging the
+migration PR makes `main` correct, which is the state you want long-term.
+
+**Verify:** `/sitemap.xml` returns 200 and lists the case-study URLs; the
+homepage renders the dark themed page rather than a white Vercel error card.
+
+Then set `site.url` in `frontend/content/site.ts` to the final domain —
+`metadataBase` and `sitemap.ts` both read it, so canonical and social-preview
+URLs stay wrong until it matches.
 
 **Note on the old URL:** `theglassofwater.github.io/PortfolioWebsite` returns
 **404** — the username rename did *not* preserve it. Only
