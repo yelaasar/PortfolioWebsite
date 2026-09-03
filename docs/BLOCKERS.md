@@ -133,25 +133,16 @@ first.
 
 ---
 
-## 5. Hugging Face model IDs use the old username — **needs checking**
+## ~~5. Hugging Face model IDs use the old username~~
 
-The extracted generation code in `ml/music-generator/` loads:
+**Resolved 2026-09-03 — not a blocker.** `theglassofwater` is the former *GitHub*
+username; the Hugging Face account was never renamed. Both
+`theglassofwater/finetuning_16.0epochs` and `theglassofwater/remi_12500` return
+HTTP 200, so `ml/music-generator/cli.py` can download weights as written. No
+action needed.
 
-- `theglassofwater/finetuning_16.0epochs`
-- `theglassofwater/remi_12500`
-
-Your GitHub username changed to `yelaasar`; these are Hugging Face, a separate
-account, so they may be unaffected. HF also redirects renamed accounts.
-
-**Blocks:** only the ability to actually *run* the CLI. The site and the
-music-generator case study are static and don't touch these — the committed
-`song.mp3` and `song.png` are pre-rendered.
-
-**To clear:** run `python cli.py --out ./out` per `ml/music-generator/README.md`
-and see whether the weights download.
-
-**If they no longer resolve:** the README records them as historical and notes the
-weights need re-uploading. Nothing else breaks.
+Kept here because "the username changed, so the model IDs must be stale" is a
+reasonable inference that happens to be wrong, and someone will make it again.
 
 ---
 

@@ -1,28 +1,39 @@
-# PortfolioWebsite
-My Portfolio Web Application, displays details such as projects and the ability to contact me.
+# Portfolio
 
-https://theglassofwater.github.io/PortfolioWebsite/ 
+Personal site for freelance work — a CV that funnels into a contact form, with
+case studies for the work behind it.
 
-Django with Rest Framework <br />
-React with Axios (react hook form, @hookform/resolvers, yup, react three fiber, react three drei ) <br />
+Built with Next.js 16 (App Router), React 19 and TypeScript. Deployed on Vercel.
 
-Project section shows my Music Generator project, where transformer 60m model is used to generate music, it is then synthisised (from midi to playable audio(mp3)). This whole process is done server side(generating the song and synthisising the .mid file).
+```
+frontend/   the site
+ml/         standalone Python from the music-generator case study
+docs/       BLOCKERS.md — what's outstanding
+```
 
+## Running it
 
-python 3.11 venv, 
-pip install -r requirements.txt, 
-Run django server, 
-run react 
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:3000
+```
 
+Copy `frontend/.env.example` to `frontend/.env.local` and fill it in to make the
+contact form send mail. Everything else works without it.
 
-Next Goals: 
+## Notes
 
-Frontend: <br />
-Go through each section/component and add UI Component libraries <br />
+Content lives in `frontend/content/` rather than in components — identity,
+experience, case studies and skills are all typed data. Placeholder copy is
+marked with `TODO(youssef):`, rendered visibly on the page, and excluded from the
+sitemap.
 
-Backend: <br />
-Make contact messages work (i actually receive the messages)<br />
+`ml/music-generator/` is a small language model fine-tuned on MIDI token streams,
+kept as a runnable CLI. It used to be served by a Django backend that ran only on
+localhost; that backend was retired in 2026, and the generation code — which
+never depended on it — was extracted rather than deleted. The pre-migration
+history is at the `pre-nextjs-migration` tag.
 
-Overall:<br />
-CI/CD Pipeline<br />
-Deploy<br />
+The site previously lived on GitHub Pages at
+`theglassofwater.github.io/PortfolioWebsite`, which no longer resolves.

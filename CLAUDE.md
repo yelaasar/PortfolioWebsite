@@ -4,46 +4,123 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Personal portfolio site: a Django + DRF backend (`WebApp/`) serving a Create React App frontend (`WebApp/frontend/`). The frontend is deployed statically to GitHub Pages (`https://theglassofwater.github.io/PortfolioWebsite/`); the backend runs locally only and is *not* deployed, so the Music Generator page only works against a local Django server.
+Personal site for freelance work: a Next.js 16 App Router app in `frontend/`,
+deployed to Vercel. It is CV-shaped — one page composing Home, Experience, Work,
+Skills and a contact form — with case-study subpages at `/work/[slug]`.
+
+`ml/music-generator/` holds a standalone Python CLI, kept as evidence for the
+case study of the same name. It is not part of the site build and nothing in
+`frontend/` imports it.
+
+A Django + DRF backend used to live in `WebApp/`. It was never deployed and was
+deleted in Phase 6 of the Next.js migration; the generation code that was worth
+keeping is now in `ml/`. Everything else is recoverable from the
+`pre-nextjs-migration` tag (pushed to origin).
 
 ## Commands
 
-All backend commands run from `WebApp/` (where `manage.py` lives); frontend commands from `WebApp/frontend/`.
-
 ```bash
-# Backend (Python 3.11 venv, deps in the repo-root requirements.txt)
-python -m venv env && source env/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver          # http://127.0.0.1:8000
-python manage.py test               # all tests
-python manage.py test api.tests.SomeTestCase.test_method   # single test
-
-# Frontend
+cd frontend
 npm install
-npm start                           # http://localhost:3000
-npm test                            # react-scripts (jest) watch mode
-npm test -- --testPathPattern=App   # single test file
+npm run dev            # http://localhost:3000
 npm run build
-npm run deploy                      # gh-pages publish of build/
+npm run lint
+
+cd ml/music-generator  # unrelated to the site build
+pip install -r requirements.txt
+python cli.py --out ./out
 ```
 
-Note: `python manage.py runserver` loads the Hugging Face transformer model at import time (see below), so startup is slow and the autoreloader loads it twice. `--noreload` avoids the double load.
+There is no test suite.
+
+## Layout
+
+```
+frontend/   the site. Vercel's Root Directory must be set to this.
+ml/         standalone Python, not part of any build
+docs/       BLOCKERS.md — what's outstanding and who owns it
+```
+
+`backend/` is reserved for a future API; the `frontend/` nesting exists so it
+can be added without either owning the repo root.
 
 ## Architecture
 
-**Two routing layers, one app.** `backend/urls.py` mounts `api/urls.py` at the root (no `/api/` prefix). `api/urls.py` uses a DRF `DefaultRouter` for `users/` and `messages/`, plus a function view at `generate_song/`, and appends `static(MEDIA_URL, ...)` so generated media is served directly by Django in DEBUG.
+**Content is data, not JSX.** Everything the site renders comes from
+`frontend/content/`: `site.ts` (identity — name, title, tagline, email, url,
+socials), `experience.ts`, `caseStudies.ts`, `skills.ts`, with shapes in
+`types.ts`. Components read these; none hardcode copy. When changing text, edit
+`content/`, not a component.
 
-**Media = generated artifacts, not uploads.** `MEDIA_ROOT` is `api/common/assets/`, served at `/common/assets/`. `generate_song` overwrites the same three files (`song.mid`, `song.png`, `song.mp3`) on every request — there is no per-request file naming, so concurrent requests clobber each other. These files are committed to git. The frontend cache-busts with `?${Date.now()}` on the URLs.
+`site.ts` is genuinely the single source — `layout.tsx`, `Home`, `Footer`,
+`sitemap.ts`, `robots.ts`, `manifest.ts` and the contact form's mailto fallback
+all read it. Several of those used to keep their own copies, which is how the
+site ended up publishing a stale year and a former GitHub username.
 
-**Model loading is module-level.** `api/views.py` calls `AutoModelForCausalLM.from_pretrained("theglassofwater/finetuning_16.0epochs")` and `REMI.from_pretrained("theglassofwater/remi_12500")` at import time (moved to CUDA if available). Any Django management command pays this cost. Generation itself lives in `api/common/util/music_generator.py`: generate tokens → decode to `.mid` via miditok → render piano-roll PNG via pretty_midi/matplotlib (`Agg` backend) → synthesize to audio and write with soundfile. `midi_to_mp3` actually writes a WAV stream to a `.mp3` filename.
+**`ExperienceEntry.caseStudySlug` is the join key** between the CV and the case
+studies — it is what makes a CV row click through to evidence.
+`assertContentIntegrity()` at the bottom of `experience.ts` runs at module load
+and **fails the build** if a slug has no matching case study.
 
-**Hardcoded absolute URLs.** `generate_download_song` returns `http://127.0.0.1:8000/common/assets/...` URLs in its JSON response, and `frontend/src/components/Axios.jsx` hardcodes `baseURL = 'http://localhost:8000/'`. Both must change together for any non-local deployment. `CORS_ALLOWED_ORIGINS` only allows `http://localhost:3000`.
+**`TODO(youssef): ...` strings are load-bearing.** `content/types.ts` exports
+`TODO()` and `isTodo()`; components render matching strings inside a
+high-contrast `<mark>`, and `sitemap.ts` filters those case studies out so a
+placeholder page is never advertised to search engines. Unfilled content is
+meant to be uncomfortable to look at, not silently invisible.
 
-**Contact form flows through UserViewSet, not MessageViewSet.** The frontend POSTs `{name, email, message}` to `users/`. `UserViewSet.create` is overridden to upsert the `User` by email and then create the `Message` in the same request. `User` is a plain `models.Model` (not `AbstractUser`) with an unused `password` field — there is no auth; all viewsets are `AllowAny`. Email validation is stricter in the model than in the frontend yup schema.
+**Server components by default.** Only `Contact/ContactForm.tsx` and the two
+`AimTrainer/` files are `'use client'`. The header nav is plain anchors plus
+`scroll-behavior: smooth` in `globals.css`, so it needs no JS.
 
-**Frontend structure.** `App.js` declares each route twice — once bare and once under `/PortfolioWebsite` — because GitHub Pages serves the app from that subpath. Pages are `components/*Page.jsx` composing section components from `components/<Name>/<Name>.js`, each with a colocated `<Name>.module.css`. The AimTrainer is a react-three-fiber scene under `components/AimTrainer/` with `gameComponents/`; it is pure client-side and touches no API.
+**Contact form → `app/api/contact/route.ts` → Resend.** The schema in
+`lib/contactSchema.ts` is shared by the client resolver and the route, so the
+two cannot drift; the route re-validates regardless. Non-obvious constraints,
+each of which has already caused a bug:
 
-## Known state
+- The Resend SDK **returns** `{ data, error }` and does not throw on API errors.
+  Branch on `error` — a `try/catch` reports success on a 422 and drops the lead.
+- `new Resend(key)` **throws** when no key resolves, so it is constructed inside
+  the handler, not at module scope.
+- The honeypot and time trap return a response **byte-identical** to success.
+  Keep it that way; a differing response tells a bot which trap it hit.
+- `to` and `from` come from env vars only. User input reaching either makes the
+  form an open relay.
+- The email is `text` only. Never add `html` or `react`.
 
-`DEBUG = True` and `ALLOWED_HOSTS = ["*"]` with a committed `SECRET_KEY` — fine for local dev, must change before any deploy. Contact messages are stored in sqlite only; the README lists "actually receive the messages", UI component libraries, and CI/CD as open goals.
+Env vars: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`. Never
+`NEXT_PUBLIC_`-prefixed. See `frontend/.env.example`.
+
+## Styling
+
+CSS Modules colocated with components, plus `app/globals.css` for tokens
+(`--background-color: #141414`, `--secondary-color: #a52a2a`,
+`--text-color: #ffffff`) and the type scale. Dark, red, monospace — preserved
+deliberately across the migration.
+
+**Next 16 uses Lightning CSS, not PostCSS.** Two consequences:
+
+1. A CSS Module selector containing no local class is a **hard build error**
+   (`Selector "label" is not pure`). Nest bare element selectors inside a class.
+2. Native nesting and range media queries (`@media (width >= 800px)`) are
+   compiled, so they are safe to use.
+
+`next/image` emits intrinsic `width`/`height` attributes, so any rule setting
+only `width` on an image also needs `height: auto` or the aspect ratio distorts.
+The hero GIF is `unoptimized` — the optimizer would serve a single still frame.
+
+## Gotchas
+
+- Route `params` is a **Promise** in Next 15+: `await params`. Most examples
+  online still show the Next 14 shape.
+- `dynamic(..., { ssr: false })` is illegal in a server component — hence the
+  thin `AimTrainerCanvas.tsx` client wrapper.
+- Error text uses `#ff6b6b`, not `var(--secondary-color)`: `#a52a2a` on
+  `#141414` is ~3.0:1 and fails WCAG AA for body text.
+- The footer year comes from `getFullYear()` at **build** time, which is correct
+  because Vercel rebuilds on every push.
+
+## Outstanding
+
+`docs/BLOCKERS.md` tracks what is unfinished and who owns it. The live one that
+affects code behaviour: `site.email` is still `youssef@example.com`, so the
+contact form's mailto fallback currently goes nowhere.

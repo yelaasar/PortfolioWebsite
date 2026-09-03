@@ -1,0 +1,10 @@
+# Direct dependencies only. The repo-root requirements.txt this replaces was a
+# 48-line `pip freeze` that mixed these with Django, DRF, django-cors-headers
+# and pySmartDL (imported nowhere). Everything else resolves transitively.
+torch
+transformers
+miditok
+pretty_midi
+matplotlib
+soundfile
+numpy
