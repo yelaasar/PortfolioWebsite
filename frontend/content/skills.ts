@@ -30,8 +30,11 @@ export const skillGroups: SkillGroup[] = [
     label: 'Practices',
     items: ['CI/CD', 'Serverless & infrastructure as code', 'AI-assisted development'],
   },
-  {
-    label: 'Machine Learning',
-    items: ['PyTorch', 'Transformers'],
-  },
 ]
+
+/*
+ * There was a Machine Learning group here (PyTorch, Transformers). Cut: two
+ * items propping up a whole heading, and the music-generator case study makes
+ * the point better than a list can — both still appear in its stack, attached
+ * to something that was actually built with them.
+ */
