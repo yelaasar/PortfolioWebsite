@@ -33,3 +33,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Confidential source documents. The Aldemis consultant profile is stamped
+# "Strictly confidential - Distribution prohibited" on every page, and anything
+# in public/ is served to the open web. Its *contents* inform content/, but the
+# file itself must never be committed or deployed.
+public/Aldemis_Consultant_Profile_*.pdf

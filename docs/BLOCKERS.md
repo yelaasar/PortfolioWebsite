@@ -12,34 +12,15 @@ are done and committed on `next-migration`.
 
 ---
 
-## 1. `site.email` is a placeholder — **you own this**
+## ~~1. `site.email` is a placeholder~~
 
-`frontend/content/site.ts` still reads:
+**Resolved 2026-09-03.** Set to `yelaasar02@gmail.com`, taken from CV.pdf. That
+CV is served at `/CV.pdf` and linked from the homepage, so the address was
+already public — publishing it in `site.ts` exposes nothing new.
 
-```ts
-email: 'youssef@example.com',
-```
-
-**Blocks:** the contact form's failure path. When the API route fails — provider
-outage, misconfigured env var, the visitor being offline — the form offers
-"email me directly" as a fallback so a lead is never a dead end. Pointing at
-`example.com` means **the safety net is itself broken**, which defeats the entire
-point of having one.
-
-**Why it's yours:** this address gets published on a public page and scraped. I
-have `youssef@aldemis.com` on file but deliberately did not publish it — that's
-a decision about your inbox, not a coding detail. It does not have to be the same
-address that receives leads (that's `CONTACT_TO_EMAIL`, which stays private in
-the environment).
-
-**To clear:** replace the string in `frontend/content/site.ts`.
-
-**Verify:** load the site, force a submission failure (stop the dev server
-mid-submit), and confirm the "email me directly" link opens your mail client
-addressed correctly with the typed message prefilled.
-
-**Cost of leaving it:** low volume now, but every lead that hits an API error is
-lost silently. This is a one-line fix — there's no good reason to carry it.
+The contact form's mailto fallback now reaches a real inbox. Note this is the
+*public* address; the inbox that receives form submissions is `CONTACT_TO_EMAIL`
+in the environment and can be different.
 
 ---
 
@@ -105,31 +86,37 @@ or GitHub Pages settings until the Vercel deploy is verified working.
 
 ---
 
-## 4. No consulting content — **you own this**
+## 4. Case-study metrics — **you own this** *(mostly resolved)*
 
-**Blocks:** nothing technically. The case-study structure ships with visible
-`TODO(youssef)` placeholders, so the build stays green and the pages render.
+**Resolved 2026-09-03:** the experience section and all six case studies are now
+written from CV.pdf and the Aldemis consultant profile. Four client engagements
+are live — banking platform recovery, accounting platform continuity, freelance
+full-stack delivery, and the dissertation. The homepage has **no placeholders
+left**.
 
-**Blocks in practice:** the entire point of the site. There's no services page and
-no pricing page, so the case studies do all the selling. A prospect who lands on
-a placeholder learns you haven't finished your own website.
+**Still outstanding: the numbers.** Four case studies carry a visible TODO where
+a metric belongs, because neither source document contains one and I would not
+invent them. On pages whose entire job is credibility, a fabricated figure is
+worse than a missing one.
 
-**To clear**, per engagement:
+| Case study | What's needed |
+|---|---|
+| Banking platform recovery | How long it had been dormant; how long recovery took |
+| Accounting platform continuity | How many months you held it solo; features shipped in that window |
+| Freelance full-stack delivery | Anything measurable — users, load, delivery time, cost saved |
+| UK electricity analysis | What the analysis concluded, plus dataset scale |
 
-- **Client** — real name, or `Confidential client, <sector>` if you're under NDA
-- **Period** — e.g. `Mar 2025 – Aug 2025`
-- **Your role** — what you were actually responsible for
-- **The problem, in their words** — what they came to you with, not what you did
-- **What you did** — 3–5 bullets, concrete
-- **An outcome containing a number**
+These are the strongest sentences on the site once filled. *"Restored a platform
+that had been dead for eight months, in three weeks"* does work that no amount
+of description does.
 
-That last one is the one people skip. *"Improved their pipeline"* is a
-description; *"cut a 40-minute nightly job to 6 minutes"* is evidence. If you
-genuinely have no number, a before/after state works — but look for the number
-first.
+**Also outstanding:** all six cards share `music_generator_icon.jpeg`. Distinct
+covers are the cheapest visual upgrade available.
 
-**Also needed:** cover images. All four project cards currently share
-`music_generator_icon.jpeg`, which reads as unfinished.
+**A discrepancy to resolve:** CV.pdf says **4 client projects** (1 transport,
+3 fintech); the Aldemis profile says **3** (1 transport, 2 fintech). The site
+currently follows the CV. Worth making them agree before a prospect compares
+them.
 
 ---
 
@@ -143,6 +130,31 @@ action needed.
 
 Kept here because "the username changed, so the model IDs must be stale" is a
 reasonable inference that happens to be wrong, and someone will make it again.
+
+---
+
+## 6. A confidential document is sitting in `frontend/public/` — **decide what to do with it**
+
+`frontend/public/Aldemis_Consultant_Profile_Youssef.pdf` is stamped **"Strictly
+confidential – Distribution prohibited"** on every page. `public/` is the
+directory Vercel serves to the open web: anything committed there is downloadable
+by anyone who guesses the filename, and it is not behind auth.
+
+**Current state:** the file is untracked, so it is *not* deployed. It is now also
+listed in `frontend/.gitignore`, so a future `git add -A` cannot publish it by
+accident.
+
+**Its contents are used** — the experience entries and case studies were written
+from it, anonymised by sector with no client named and no figure that is not also
+in your own CV. That is fine. Serving the document itself is not.
+
+**To clear:** move the file out of `frontend/public/` entirely. Nothing in the
+site references it, so nothing breaks. Keep it wherever you keep source documents
+— just not in a directory whose whole purpose is being publicly served.
+
+> Worth deciding separately: whether Aldemis considers the *contents* shareable
+> even anonymised. The engagements are described at a level a prospect needs, but
+> you are the one with the contract.
 
 ---
 

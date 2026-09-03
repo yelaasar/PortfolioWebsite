@@ -1,33 +1,53 @@
 import type { SkillGroup } from './types'
 
 /**
- * Was three unlabelled <div>s in Skills.tsx separated by anonymous red <hr>s,
- * so a reader could see the grouping but not what any group meant. The labels
- * are the point of moving this into data.
+ * Grouped as on the consultant profile, which leads with the commercial stack
+ * rather than the academic one. The previous list was ML-first (PyTorch, NumPy,
+ * Pandas, Scikit-Learn) — accurate for the dissertation, misleading about what
+ * the client work actually is.
  */
 export const skillGroups: SkillGroup[] = [
   {
-    label: 'Domains',
-    items: ['Machine Learning', 'Artificial Intelligence', 'Web Development'],
-  },
-  {
     label: 'Languages',
-    // TypeScript added — this site is written in it.
-    items: ['Python', 'TypeScript', 'JavaScript', 'SQL', 'Java', 'HTML', 'CSS', 'MATLAB'],
+    items: ['C#', 'TypeScript', 'JavaScript', 'Python', 'Dart', 'SQL'],
   },
   {
-    label: 'Tools & Frameworks',
-    // Next.js added for the same reason. Django kept: retiring the backend in
-    // this repo does not unlearn it.
+    label: 'Frameworks',
     items: [
-      'PyTorch',
-      'NumPy',
-      'Pandas',
-      'Scikit-Learn',
-      'Matplotlib',
-      'React',
+      '.NET / ASP.NET MVC',
       'Next.js',
+      'React',
       'Django',
+      'Flutter',
+      'Tailwind CSS',
     ],
+  },
+  {
+    label: 'Data & Cloud',
+    items: [
+      'PostgreSQL',
+      'Supabase',
+      'AWS (Lambda, EC2, RDS, CDK)',
+      'Azure',
+      'GCP',
+      'Vercel',
+      'RESTful APIs',
+      'Serverless & edge functions',
+    ],
+  },
+  {
+    label: 'Tools & Practices',
+    items: [
+      'Git',
+      'CI/CD pipelines',
+      'Jira',
+      'Agile delivery',
+      'AI-assisted development',
+      'UiPath',
+    ],
+  },
+  {
+    label: 'Machine Learning',
+    items: ['PyTorch', 'Transformers', 'NumPy', 'Pandas', 'Scikit-Learn', 'Matplotlib'],
   },
 ]
