@@ -24,37 +24,31 @@ in the environment and can be different.
 
 ---
 
-## 2. No Resend account or API key — **you own this**
+## 2. No notification channel configured yet — **you own this**
 
-**Blocks:** end-to-end verification of the contact form. The route can be built
-and tested without it — the 400/413/415/honeypot branches all work offline — but
-**no email can actually be sent**, so "does a lead reach my inbox?" stays
-unanswered until this exists.
+**Blocks:** enquiries actually reaching you. Everything else about the form works
+without it — validation, the spam traps, and the graceful failure path with its
+mailto fallback are all live and tested.
 
-**To clear:**
+**Full walkthrough: [SETUP.md](SETUP.md).** Short version:
 
-1. Sign up at <https://resend.com> using **the address that should receive
-   leads**. On the free tier you can only send *to* the account owner's address,
-   so this choice is load-bearing.
-2. Create an API key at <https://resend.com/api-keys>.
-3. Locally: copy `frontend/.env.example` to `frontend/.env.local` and fill in
-   `RESEND_API_KEY` and `CONTACT_TO_EMAIL`. Leave
-   `CONTACT_FROM_EMAIL=onboarding@resend.dev`.
-4. On Vercel (once Blocker 3 clears): add all three to **Production, Preview and
-   Development**. Setting them only on Production is the most common cause of
-   "works locally, 500 on the preview URL".
+- **Discord** (~2 min, free, no signup beyond Discord): Server Settings →
+  Integrations → Webhooks → New Webhook → Copy Webhook URL → set
+  `DISCORD_WEBHOOK_URL`. **This alone is enough** — email is optional.
+- **Email** (~5 min, free): a Resend key plus `CONTACT_TO_EMAIL` and
+  `CONTACT_FROM_EMAIL`. Adds an archive and one-tap Reply to the lead.
 
-> **Never prefix these with `NEXT_PUBLIC_`.** That ships the API key in the
-> client bundle to every visitor.
+Set them locally in `frontend/.env.local`, and on Vercel across **all three**
+environments, then redeploy — env changes do not reach an existing deployment.
 
-**Verify:** submit the form; the email arrives; hitting Reply addresses the
-*lead*, not `onboarding@resend.dev`. **Check your spam folder** — free-tier mail
-from `resend.dev` lands there regularly.
+**Verify:** submit the form. `500` means nothing is configured; `502` means
+something is configured but failing (the logs name which channel and why); `200`
+means it landed.
 
-**Free-tier limits, and when to care:** 100 emails/day, 3,000/month. You can only
-send from `onboarding@resend.dev` and only to your own address, so you cannot
-send the lead a confirmation. Buying a domain (~£10/yr, ~20 min of DNS) removes
-both restrictions — worth doing after the first real lead, not before.
+**Cost:** nothing, and neither provider asks for a card. Discord webhooks are
+unlimited; Resend's free tier is 3,000/month. A custom domain (~£10/yr) is the
+only optional paid item, and only lifts Resend's "send to your own address"
+limit — irrelevant while you are the recipient.
 
 ---
 

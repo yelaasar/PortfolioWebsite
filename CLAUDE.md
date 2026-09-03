@@ -72,23 +72,45 @@ meant to be uncomfortable to look at, not silently invisible.
 `AimTrainer/` files are `'use client'`. The header nav is plain anchors plus
 `scroll-behavior: smooth` in `globals.css`, so it needs no JS.
 
-**Contact form → `app/api/contact/route.ts` → Resend.** The schema in
-`lib/contactSchema.ts` is shared by the client resolver and the route, so the
-two cannot drift; the route re-validates regardless. Non-obvious constraints,
-each of which has already caused a bug:
+**Contact form → `app/api/contact/route.ts` → `lib/notify.ts` → Discord and/or
+email.** The schema in `lib/contactSchema.ts` is shared by the client resolver
+and the route, so the two cannot drift; the route re-validates regardless.
+
+Notifications fan out. Each sender in `notify.ts` returns `null` to mean "not
+configured" rather than failing, and the route uses `Promise.allSettled` so one
+channel throwing cannot suppress another that succeeded. Status contract:
+
+| Outcome | Status |
+|---|---|
+| Any channel delivered | 200 `{"ok":true}` |
+| Every configured channel failed | 502 |
+| No channel configured at all | 500 |
+
+Non-obvious constraints, each of which has already caused a bug:
 
 - The Resend SDK **returns** `{ data, error }` and does not throw on API errors.
   Branch on `error` — a `try/catch` reports success on a 422 and drops the lead.
 - `new Resend(key)` **throws** when no key resolves, so it is constructed inside
-  the handler, not at module scope.
+  the sender, not at module scope.
+- Discord answers a successful webhook with **204**, not 200. Use `res.ok`.
+- Discord's `allowed_mentions: { parse: [] }` is load-bearing: without it a lead
+  typing `@everyone` pings the whole server.
+- Discord caps `content` at **2000** characters against the schema's 5000 max, so
+  truncation is required, not defensive. It also renders markdown, hence
+  `escapeMarkdown()`.
 - The honeypot and time trap return a response **byte-identical** to success.
   Keep it that way; a differing response tells a bot which trap it hit.
 - `to` and `from` come from env vars only. User input reaching either makes the
   form an open relay.
 - The email is `text` only. Never add `html` or `react`.
 
-Env vars: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`. Never
-`NEXT_PUBLIC_`-prefixed. See `frontend/.env.example`.
+Env vars: `DISCORD_WEBHOOK_URL`, and/or `RESEND_API_KEY` + `CONTACT_TO_EMAIL` +
+`CONTACT_FROM_EMAIL`. Never `NEXT_PUBLIC_`-prefixed. Setup walkthrough is in
+`docs/SETUP.md`; `frontend/.env.example` lists the names.
+
+`components/Contact/ContactForm.tsx` is provider-agnostic — it knows only
+`/api/contact`, the status codes and `site.email`. Adding or swapping a channel
+should never touch it.
 
 ## Styling
 
