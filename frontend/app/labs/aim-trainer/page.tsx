@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import AimTrainerCanvas from '@/components/AimTrainer/AimTrainerCanvas'
+import AimTrainer from '@/games/aim-trainer/react/AimTrainer'
 
 export const metadata: Metadata = {
   title: 'Aim Trainer',
-  description: 'A small react-three-fiber target-clicking game.',
+  description: 'A timed target-clicking game built on a small three.js engine.',
 }
 
 export default function AimTrainerPage() {
-  return <AimTrainerCanvas />
+  return <AimTrainer />
 }

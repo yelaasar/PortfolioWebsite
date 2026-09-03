@@ -68,9 +68,22 @@ high-contrast `<mark>`, and `sitemap.ts` filters those case studies out so a
 placeholder page is never advertised to search engines. Unfilled content is
 meant to be uncomfortable to look at, not silently invisible.
 
-**Server components by default.** Only `Contact/ContactForm.tsx` and the two
-`AimTrainer/` files are `'use client'`. The header nav is plain anchors plus
-`scroll-behavior: smooth` in `globals.css`, so it needs no JS.
+**Server components by default.** Only `Contact/ContactForm.tsx` and the three
+files under `games/aim-trainer/react/` are `'use client'`. The header nav is
+plain anchors plus `scroll-behavior: smooth` in `globals.css`, so it needs no JS.
+
+**`games/aim-trainer/` is a guest, not a component.** It is a self-contained
+three.js game behind one entry point (`index.ts` exports `createGame(element)`),
+built so it can be lifted into its own repo and embedded back as an iframe. The
+engine under `engine/` is plain TypeScript — it imports React nowhere, and owns
+its own `Scene`, renderer, rAF loop and systems. `react/` is the only bridge:
+`useGame.ts` mounts the engine and turns its snapshots into React state, and the
+HUD is DOM drawn over the canvas, not geometry inside it. Nothing outside the
+directory may import `engine/` internals; keep the seam at `index.ts`.
+
+Snapshots are quantised (`clockResolutionMs`) so the HUD re-renders ~10x a
+second rather than once per frame — putting per-frame game state in React state
+is exactly what this structure exists to prevent.
 
 **Contact form → `app/api/contact/route.ts` → `lib/notify.ts` → Discord and/or
 email.** The schema in `lib/contactSchema.ts` is shared by the client resolver
@@ -134,8 +147,10 @@ The hero GIF is `unoptimized` — the optimizer would serve a single still frame
 
 - Route `params` is a **Promise** in Next 15+: `await params`. Most examples
   online still show the Next 14 shape.
-- `dynamic(..., { ssr: false })` is illegal in a server component — hence the
-  thin `AimTrainerCanvas.tsx` client wrapper.
+- `dynamic(..., { ssr: false })` is illegal in a server component. Rather than a
+  wrapper component to host it, `useGame.ts` does a plain `import()` inside
+  `useEffect` — same effect (`three` stays out of the server bundle and off
+  every other route), no extra file.
 - Error text uses `#ff6b6b`, not `var(--secondary-color)`: `#a52a2a` on
   `#141414` is ~3.0:1 and fails WCAG AA for body text.
 - The footer year comes from `getFullYear()` at **build** time, which is correct
