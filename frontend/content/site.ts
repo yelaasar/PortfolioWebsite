@@ -6,6 +6,11 @@
 export const site = {
   name: 'Youssef El Aasar',
 
+  // The old site's <title> was exactly "YE" and its manifest short_name was
+  // "YE". Kept as the tab/brand mark so the tab still reads the same at a
+  // glance, while the full title carries the keywords a search result needs.
+  shortName: 'YE',
+
   // Matches the title on the CV. Deliberately not "Software Engineer" alone —
   // "Technical Consultant" is what says client-facing, which is the whole point
   // of the site.

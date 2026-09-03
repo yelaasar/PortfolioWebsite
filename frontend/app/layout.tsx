@@ -5,13 +5,18 @@ import './globals.css'
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${site.title}`,
-    template: `%s | ${site.name}`,
+    // Leads with "YE" so the tab reads as it did on the old site, where the
+    // title was exactly that. The rest carries the keywords a search result
+    // and a shared link need.
+    default: `${site.shortName} — ${site.title}`,
+    template: `%s | ${site.shortName}`,
   },
   description: site.tagline,
   openGraph: {
     type: 'website',
     siteName: site.name,
+    // Full name here, not the YE mark: a social card is seen cold by someone
+    // who has no idea what "YE" stands for.
     title: `${site.name} — ${site.title}`,
     description: site.tagline,
     url: '/',
