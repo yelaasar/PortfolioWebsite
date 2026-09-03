@@ -48,7 +48,7 @@ export default function Home() {
         {/* Was a <button> nested inside an <a>, which is invalid HTML. */}
         <a
           className={`${cta.cta} ${styles.cv}`}
-          href="/CV_Base_Data.pdf"
+          href="/CV.pdf"
           target="_blank"
           rel="noopener noreferrer"
         >
