@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { ValidationError } from 'yup'
-import { Resend } from 'resend'
 import { contactSchema, HONEYPOT_FIELD, MIN_FILL_MS } from '@/lib/contactSchema'
+import { notifyEmail, notifyTelegram, type NotifyResult } from '@/lib/notify'
 
 // No-op today (nodejs is the default), kept as documentation: an HMAC-signed
 // timestamp or an MX lookup on the lead's domain would need node:crypto /
@@ -9,16 +9,6 @@ import { contactSchema, HONEYPOT_FIELD, MIN_FILL_MS } from '@/lib/contactSchema'
 export const runtime = 'nodejs'
 
 const MAX_BODY_BYTES = 20_000
-
-// C0/C1 controls plus bidi overrides. The latter matter: a name containing
-// U+202E visually reverses the rendered subject line in most mail clients,
-// which is a cheap way to make a message look like it came from someone else.
-const CONTROL_AND_BIDI =
-  /[\u0000-\u001F\u007F-\u009F\u200E\u200F\u202A-\u202E\u2066-\u2069]/g
-
-function oneLine(value: string, max: number): string {
-  return value.replace(CONTROL_AND_BIDI, ' ').replace(/\s+/g, ' ').trim().slice(0, max)
-}
 
 function clientIp(req: Request): string {
   return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -63,7 +53,7 @@ export async function POST(req: Request) {
     if (typeof trap === 'string' && trap.trim() !== '') {
       // This log is the only way to detect a false positive (a real visitor
       // whose browser autofilled the field). A false positive is silent lead
-      // loss: if this appears with a plausible IP and no matching email
+      // loss: if this appears with a plausible IP and no matching enquiry
       // arrives, rename HONEYPOT_FIELD to something with no autofill mapping.
       console.warn('[contact] honeypot tripped', { ip: clientIp(req) })
       return accepted()
@@ -97,62 +87,50 @@ export async function POST(req: Request) {
       throw err
     }
 
-    const apiKey = process.env.RESEND_API_KEY
-    const toEmail = process.env.CONTACT_TO_EMAIL
-    const fromEmail = process.env.CONTACT_FROM_EMAIL
-    if (!apiKey || !toEmail || !fromEmail) {
-      console.error('[contact] missing configuration', {
-        hasKey: Boolean(apiKey),
-        hasTo: Boolean(toEmail),
-        hasFrom: Boolean(fromEmail),
-      })
+    // Every configured channel is attempted. Promise.allSettled rather than
+    // Promise.all: one channel throwing must not prevent the other from being
+    // awaited, or a Telegram outage would suppress the email that did send.
+    const settled = await Promise.allSettled([notifyEmail(input), notifyTelegram(input)])
+
+    const results: NotifyResult[] = []
+    for (const outcome of settled) {
+      if (outcome.status === 'fulfilled') {
+        // null means "this channel is not configured" — not a failure.
+        if (outcome.value) results.push(outcome.value)
+      } else {
+        console.error('[contact] channel threw', outcome.reason)
+      }
+    }
+
+    if (results.length === 0) {
+      console.error(
+        '[contact] no delivery channel configured — set RESEND_API_KEY + ' +
+          'CONTACT_TO_EMAIL + CONTACT_FROM_EMAIL, and/or TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID',
+      )
       return NextResponse.json({ error: 'server_error' }, { status: 500 })
     }
 
-    const displayName = oneLine(input.name, 80)
+    const delivered = results.filter((r) => r.ok)
+    const failed = results.filter((r) => !r.ok)
 
-    // Constructed here, not at module scope: `new Resend()` throws when no key
-    // resolves, which at module scope turns a missing env var into an
-    // import-time crash instead of the handled 500 above.
-    const resend = new Resend(apiKey)
-
-    const { data, error } = await resend.emails.send({
-      // `to` and `from` come from the environment and never from input. This
-      // is the only thing preventing the form from becoming an open relay;
-      // there is no sanitisation that makes a user-supplied `to` safe.
-      from: `Portfolio Contact <${fromEmail}>`,
-      to: [toEmail],
-      // A string, never an array — an array is how you accidentally build a
-      // fan-out. Safe because EMAIL_RE rejects whitespace and separators.
-      replyTo: input.email,
-      subject: oneLine(`Portfolio contact — ${displayName}`, 120),
-      // Plain text only. Never `html` or `react`: interpolating a stranger's
-      // message into HTML creates an XSS surface inside your own mail client.
-      //
-      // The address is printed in the body deliberately. Nothing verifies the
-      // sender owns it, so it is a claim, not identity — seeing it next to the
-      // message is what stops Reply going somewhere surprising unnoticed.
-      text: [
-        `Name:  ${displayName}`,
-        `Email: ${input.email}`,
-        `Sent:  ${new Date().toISOString()}`,
-        '',
-        '--- message ---',
-        input.message,
-      ].join('\n'),
-    })
-
-    // The SDK does NOT throw on API errors — fetchRequest catches non-2xx and
-    // returns { data: null, error }. A bare try/catch here would report success
-    // on a 422 or 429 and drop the lead silently. This branch is mandatory.
-    if (error) {
-      console.error('[contact] resend send failed', { name: error.name, message: error.message })
-      return NextResponse.json({ error: 'send_failed' }, { status: 502 })
+    // Log failures even when another channel succeeded: a quietly dead channel
+    // is exactly the kind of thing nobody notices until they need it.
+    for (const f of failed) {
+      console.error('[contact] channel failed', { channel: f.channel, error: f.error })
     }
 
-    // Length, never the body: Vercel logs are not a PII store.
-    console.info('[contact] sent', { id: data?.id, messageLength: input.message.length })
-    return accepted()
+    // Succeed if ANY channel landed. The lead has reached you; which pipe it
+    // came down is your problem, not the visitor's.
+    if (delivered.length > 0) {
+      console.info('[contact] delivered', {
+        via: delivered.map((r) => r.channel),
+        failed: failed.map((r) => r.channel),
+        messageLength: input.message.length, // length, never the body
+      })
+      return accepted()
+    }
+
+    return NextResponse.json({ error: 'send_failed' }, { status: 502 })
   } catch (err) {
     console.error('[contact] unhandled', err)
     return NextResponse.json({ error: 'server_error' }, { status: 500 })
