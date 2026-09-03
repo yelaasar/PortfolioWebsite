@@ -18,7 +18,7 @@ const INITIAL_SNAPSHOT: GameSnapshot = {
 interface UseGame {
   snapshot: GameSnapshot
   ready: boolean
-  start: () => void
+  start: (durationMs?: number) => void
   stop: () => void
 }
 
@@ -62,7 +62,7 @@ export function useGame(containerRef: React.RefObject<HTMLElement | null>): UseG
     }
   }, [containerRef])
 
-  const start = useCallback(() => handleRef.current?.start(), [])
+  const start = useCallback((durationMs?: number) => handleRef.current?.start(durationMs), [])
   const stop = useCallback(() => handleRef.current?.stop(), [])
 
   return { snapshot, ready, start, stop }

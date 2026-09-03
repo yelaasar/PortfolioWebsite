@@ -1,18 +1,21 @@
 'use client'
 
 import cta from '@/components/ui/CTAButton.module.css'
-import { DEFAULT_CONFIG } from '../engine/types'
 import type { GameSnapshot } from '../engine/types'
 import styles from './aim-trainer.module.css'
 
-const ROUND_SECONDS = Math.round(DEFAULT_CONFIG.roundDurationMs / 1000)
+/** Round lengths the menu offers, in milliseconds. */
+export const ROUND_LENGTHS_MS = [15_000, 30_000, 60_000]
+
 /** Below this the clock turns red. */
 const URGENT_MS = 5_000
 
 interface HudProps {
   snapshot: GameSnapshot
   ready: boolean
-  onStart: () => void
+  selectedDurationMs: number
+  onSelectDuration: (durationMs: number) => void
+  onStart: (durationMs: number) => void
 }
 
 /**
@@ -20,7 +23,13 @@ interface HudProps {
  * drei's <Text>, which meant shipping a text-geometry library and a font fetch
  * to render six characters that HTML renders for free.
  */
-export default function Hud({ snapshot, ready, onStart }: HudProps) {
+export default function Hud({
+  snapshot,
+  ready,
+  selectedDurationMs,
+  onSelectDuration,
+  onStart,
+}: HudProps) {
   const { phase } = snapshot
 
   if (!ready) return <p className={styles.loading}>Loading…</p>
@@ -45,8 +54,9 @@ export default function Hud({ snapshot, ready, onStart }: HudProps) {
         <>
           <h1>Aim Trainer</h1>
           <p>
-            Click the targets. They move when hit and after a moment on their own.
-            You get {ROUND_SECONDS} seconds — misses count against your accuracy.
+            Click the targets. They only move when you hit them — you get{' '}
+            {Math.round(selectedDurationMs / 1000)} seconds, and misses count against
+            your accuracy.
           </p>
         </>
       ) : (
@@ -66,7 +76,19 @@ export default function Hud({ snapshot, ready, onStart }: HudProps) {
           </dl>
         </>
       )}
-      <button type="button" className={cta.cta} onClick={onStart}>
+      <div className={styles.durationPicker}>
+        {ROUND_LENGTHS_MS.map((ms) => (
+          <button
+            key={ms}
+            type="button"
+            className={ms === selectedDurationMs ? styles.durationOptionSelected : undefined}
+            onClick={() => onSelectDuration(ms)}
+          >
+            {ms / 1000}s
+          </button>
+        ))}
+      </div>
+      <button type="button" className={cta.cta} onClick={() => onStart(selectedDurationMs)}>
         {phase === 'idle' ? 'Start' : 'Play again'}
       </button>
     </div>

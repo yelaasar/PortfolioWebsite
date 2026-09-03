@@ -31,8 +31,9 @@ export class RoundSystem {
     return this._phase === 'idle' ? this.durationMs : this.remainingMs
   }
 
-  start(): void {
-    this.remainingMs = this.durationMs
+  /** `durationMs` overrides the constructor default for this round only. */
+  start(durationMs?: number): void {
+    this.remainingMs = durationMs ?? this.durationMs
     this.setPhase('running')
   }
 

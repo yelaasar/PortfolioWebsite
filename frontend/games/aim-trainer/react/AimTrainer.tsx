@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef } from 'react'
-import Hud from './Hud'
+import Link from 'next/link'
+import { useRef, useState } from 'react'
+import Hud, { ROUND_LENGTHS_MS } from './Hud'
 import { useGame } from './useGame'
 import styles from './aim-trainer.module.css'
 
@@ -12,13 +13,23 @@ import styles from './aim-trainer.module.css'
 export default function AimTrainer() {
   const containerRef = useRef<HTMLDivElement>(null)
   const { snapshot, ready, start } = useGame(containerRef)
+  const [durationMs, setDurationMs] = useState(ROUND_LENGTHS_MS[1])
 
   return (
     <section className={styles.page}>
+      <p className={styles.back}>
+        <Link href="/">← Back to site</Link>
+      </p>
       <div className={styles.stage}>
         <div ref={containerRef} className={styles.canvas} />
         <div className={styles.overlay}>
-          <Hud snapshot={snapshot} ready={ready} onStart={start} />
+          <Hud
+            snapshot={snapshot}
+            ready={ready}
+            selectedDurationMs={durationMs}
+            onSelectDuration={setDurationMs}
+            onStart={start}
+          />
         </div>
       </div>
     </section>

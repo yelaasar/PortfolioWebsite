@@ -9,6 +9,27 @@
   box-sizing: border-box;
 }
 
+/* Matches the "back to work" link on the case-study pages (caseStudy.module.css)
+   so leaving a subpage reads the same way everywhere on the site. */
+.back {
+  /* body { text-align: center } in globals.css otherwise centers this. */
+  text-align: left;
+  flex-shrink: 0;
+  margin: 0 0 0.5rem;
+  padding: 0 0.5rem;
+
+  a {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
 /* The engine sizes itself from this element, so it must have a real height of
    its own rather than being sized by the canvas it contains. */
 .stage {
@@ -97,6 +118,36 @@
   margin: 0;
   max-width: 24rem;
   line-height: 1.5;
+}
+
+/* Nesting the button rules under .durationPicker (rather than a flat
+   .durationOption class) keeps their specificity above the ".panel button"
+   rule above, which would otherwise win the padding/width tug-of-war. */
+.durationPicker {
+  display: flex;
+  gap: 0.5rem;
+
+  button {
+    font-family: Courier;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    background: transparent;
+    border: 1px solid #fefefeaf;
+    border-radius: 4rem;
+    width: auto;
+    padding: 0.3rem 1rem;
+    cursor: pointer;
+    transition: background-color 150ms ease-in-out, border-color 150ms ease-in-out;
+  }
+
+  button:hover {
+    border-color: var(--secondary-color);
+  }
+
+  button.durationOptionSelected {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
 }
 
 .results {
