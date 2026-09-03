@@ -19,8 +19,9 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-Copy `frontend/.env.example` to `frontend/.env.local` and fill it in to make the
-contact form send mail. Everything else works without it.
+To make the contact form reach you, follow [docs/SETUP.md](docs/SETUP.md) — a
+Discord webhook takes about two minutes and costs nothing. Everything else works
+without it; an unconfigured form still renders and offers a mailto fallback.
 
 ## Notes
 
