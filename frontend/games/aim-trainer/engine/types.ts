@@ -5,12 +5,10 @@
 export type GamePhase = 'idle' | 'running' | 'ended'
 
 export interface GameConfig {
-  /** Length of a round. */
+  /** Default round length, used when `start()` is called with no override. */
   roundDurationMs: number
   /** How many targets are alive at once. */
   targetCount: number
-  /** How long a target survives before it relocates on its own. */
-  targetLifetimeMs: number
   /** Granularity the round clock is reported at — see `snapshot()` in Game.ts. */
   clockResolutionMs: number
 }
@@ -18,7 +16,6 @@ export interface GameConfig {
 export const DEFAULT_CONFIG: GameConfig = {
   roundDurationMs: 30_000,
   targetCount: 3,
-  targetLifetimeMs: 2_500,
   clockResolutionMs: 100,
 }
 
@@ -35,8 +32,8 @@ export interface GameSnapshot {
 }
 
 export interface GameHandle {
-  /** idle | ended -> running, from a clean slate. */
-  start(): void
+  /** idle | ended -> running, from a clean slate. `durationMs` overrides the config default for this round only. */
+  start(durationMs?: number): void
   /** Abandon a round in progress. */
   stop(): void
   /** Returns an unsubscribe function. Fires immediately with current state. */

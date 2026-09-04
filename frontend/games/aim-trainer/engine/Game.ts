@@ -70,7 +70,7 @@ export class Game implements GameHandle {
       { length: this.config.targetCount },
       () => new Target(this.geometry, this.idleMaterial, this.hoverMaterial),
     )
-    this.spawn = new SpawnSystem(this.scene, targets, this.config.targetLifetimeMs)
+    this.spawn = new SpawnSystem(this.scene, targets)
     this.round = new RoundSystem(this.config.roundDurationMs, this.handlePhaseChange)
     this.input = new InputSystem(this.renderer.domElement, this.camera, targets, {
       onHit: this.handleHit,
@@ -86,9 +86,9 @@ export class Game implements GameHandle {
     this.loop.start()
   }
 
-  start(): void {
+  start(durationMs?: number): void {
     if (this.disposed || this.round.phase === 'running') return
-    this.round.start()
+    this.round.start(durationMs)
   }
 
   stop(): void {
@@ -141,9 +141,8 @@ export class Game implements GameHandle {
     this.scene.add(point)
   }
 
-  private frame = (deltaMs: number, nowMs: number): void => {
+  private frame = (deltaMs: number): void => {
     this.round.update(deltaMs)
-    if (this.round.phase === 'running') this.spawn.update(nowMs)
     this.renderer.render(this.scene, this.camera)
     this.publish()
   }

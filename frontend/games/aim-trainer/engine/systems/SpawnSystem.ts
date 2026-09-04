@@ -5,11 +5,15 @@ import { Target } from '../entities/Target'
 const TARGET_RADIUS = 0.75
 
 /**
- * Owns the pool of targets and decides where and when they appear.
+ * Owns the pool of targets and decides where they appear.
  *
  * Positions are derived from bounds the camera hands down rather than the
  * hardcoded ±6 / ±3 the r3f version used: those constants only framed correctly
  * at one aspect ratio, and targets fell off-screen at every other window size.
+ *
+ * Targets are otherwise static — the only thing that moves one is `relocate`,
+ * called from a hit or a round reset. There is no timer that relocates a target
+ * on its own; a target you ignore just sits there until it's clicked.
  */
 export class SpawnSystem {
   readonly targets: readonly Target[]
@@ -19,7 +23,6 @@ export class SpawnSystem {
   constructor(
     private readonly scene: Scene,
     targets: Target[],
-    private readonly lifetimeMs: number,
   ) {
     this.targets = targets
     for (const target of targets) scene.add(target.mesh)
@@ -37,16 +40,6 @@ export class SpawnSystem {
 
   hideAll(): void {
     for (const target of this.targets) target.hide()
-  }
-
-  /** Relocates targets that have outlived `lifetimeMs`. */
-  update(nowMs: number): void {
-    if (this.lifetimeMs <= 0) return
-    for (const target of this.targets) {
-      if (target.visible && target.ageMs(nowMs) >= this.lifetimeMs) {
-        this.relocate(target, nowMs)
-      }
-    }
   }
 
   /**
