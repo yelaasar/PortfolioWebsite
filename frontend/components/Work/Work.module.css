@@ -5,7 +5,9 @@
   margin-bottom: 10dvh;
 
   img {
-    width: 50%;
+    /* Fixed, not a percentage: the anchor is fit-content, so a % width tracks
+       the title's text width and cards with short titles get smaller images. */
+    width: 11.5rem;
     /* next/image emits intrinsic width+height; without this the CSS width
        alone distorts the aspect ratio. */
     height: auto;
@@ -15,13 +17,29 @@
   }
 
   a {
-    width: fit-content;
+    /* Fixed, not fit-content: with fit-content the anchor's width tracks the
+       title text, so image position shifted card by card and rows misaligned.
+       flex-shrink: 0 because the anchor is a flex item next to the blurb —
+       without it the width gets squeezed by a different amount per card. */
+    width: 16rem;
+    flex-shrink: 0;
     text-decoration: none;
     /* Was #222 — near-invisible on #141414, but cosmetically dead: the anchor
        only contains an <h2> and an <img>, and the global h2 rule beats
        inheritance. Corrected anyway so it can't bite later. */
     color: var(--text-color);
     transition: transform 200ms ease-in-out;
+
+    /* Reserve the same title block on every card (3 lines at 1.5rem h2), so
+       images sit at the same height whether a title wraps to 1 line or 3.
+       Flex-centered so a short title sits in the middle of the reserved
+       block instead of hugging its top. */
+    h2 {
+      min-height: 5.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 
   a:hover {

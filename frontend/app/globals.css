@@ -66,5 +66,7 @@ code {
   font-size: 2.5rem;
   font-family: monospace;
   text-transform: uppercase;
-  margin: 2rem;
+  /* Less above, more below: the title should sit closer to the section it
+     ends than to the content it introduces. */
+  margin: 1.25rem 2rem 2.75rem;
 }

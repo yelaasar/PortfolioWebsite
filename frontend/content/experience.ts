@@ -25,6 +25,7 @@ export const experience: ExperienceEntry[] = [
       'Assumed sole responsibility for a live Django, PostgreSQL and AWS accounting platform after the previous engineering team departed — shipping new features on Lambda, EC2 and RDS while maintaining operational continuity until a new team was onboarded.',
       'Building software for a startup client in .NET and Next.js across Azure and GCP, working end to end from backend services through to the deployed environment.',
       'Trusted with production ownership early: both the banking and accounting engagements were inherited systems with no handover from the previous team.',
+      'Built DelayMate, a consumer Flutter app for UK rail passengers with automatic background journey tracking on a serverless AWS backend — taken through App Store review ahead of its public launch.',
     ],
     stack: ['.NET', 'Next.js', 'Python', 'Django', 'PostgreSQL', 'AWS', 'Azure', 'GCP'],
     caseStudySlug: 'banking-platform-recovery',
@@ -45,7 +46,6 @@ export const experience: ExperienceEntry[] = [
       'Ran delivery independently through Jira and Git — scoping, sequencing and shipping without an engineering team around me.',
     ],
     stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Flutter', 'AWS CDK'],
-    caseStudySlug: 'freelance-fullstack-delivery',
   },
 
   {
