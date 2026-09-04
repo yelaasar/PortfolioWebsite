@@ -6,6 +6,16 @@ import styles from './aim-trainer.module.css'
 
 const NAME_STORAGE_KEY = 'aimTrainerName'
 const MAX_NAME_LENGTH = 20
+const GENERIC_SAVE_ERROR = "Couldn't save — try again."
+/**
+ * The two ways the API route reports "the leaderboard isn't fully set up" —
+ * distinct codes server-side (frontend/app/api/leaderboard/route.ts) so
+ * whoever's deploying it can tell which env var is missing from the Vercel
+ * logs. Client-side, "retrying" is equally useless for either, so both map to
+ * the same message here rather than "try again."
+ */
+const NOT_CONFIGURED_ERRORS = new Set(['supabase_not_configured', 'ip_hash_secret_not_configured'])
+const NOT_CONFIGURED_SAVE_ERROR = "Leaderboard isn't fully set up yet."
 
 interface LeaderboardEntry {
   name: string
@@ -47,6 +57,7 @@ export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
   const [configured, setConfigured] = useState(true)
   const [name, setName] = useState('')
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState(GENERIC_SAVE_ERROR)
   const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
@@ -103,6 +114,15 @@ export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
         }),
       })
       if (!res.ok) {
+        let code: string | undefined
+        try {
+          code = (await res.json()).error
+        } catch {
+          // Body wasn't JSON (or was empty) — fall through to the generic message.
+        }
+        setErrorMessage(
+          code && NOT_CONFIGURED_ERRORS.has(code) ? NOT_CONFIGURED_SAVE_ERROR : GENERIC_SAVE_ERROR,
+        )
         setStatus('error')
         return
       }
@@ -114,6 +134,10 @@ export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
       setStatus('saved')
       setRefreshKey((k) => k + 1)
     } catch {
+      // A thrown fetch is a network failure, never a *_not_configured response
+      // (those resolve normally with a non-ok status) — always the generic
+      // message here, overwriting whatever an earlier attempt might have set.
+      setErrorMessage(GENERIC_SAVE_ERROR)
       setStatus('error')
     }
   }
@@ -142,7 +166,7 @@ export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
         </div>
       )}
       {status === 'saved' && <p className={styles.saved}>Saved!</p>}
-      {status === 'error' && <p className={styles.saveError}>Couldn&apos;t save — try again.</p>}
+      {status === 'error' && <p className={styles.saveError}>{errorMessage}</p>}
 
       <h2 className={styles.leaderboardTitle}>Leaderboard — {durationMs / 1000}s</h2>
       {entries === null ? (
