@@ -1,6 +1,8 @@
 import type { CaseStudy } from './types'
 import { TODO } from './types'
 import musicGeneratorImage from '@/assets/music_generator_icon.jpeg'
+import delaymateImage from '@/assets/delaymate_cover.png'
+import aimTrainerImage from '@/assets/aim_trainer_cover.png'
 
 /**
  * Case studies. `featured` entries render on the homepage; every entry gets a
@@ -14,8 +16,9 @@ import musicGeneratorImage from '@/assets/music_generator_icon.jpeg'
  * document, it is left as a visible TODO rather than estimated. An invented
  * metric on a page whose whole job is credibility is worse than a missing one.
  *
- * TODO(youssef): every card shares one cover image. Distinct covers are the
- * cheapest visual upgrade available here — see docs/BLOCKERS.md #4.
+ * TODO(youssef): five of six cards still share the music-generator cover.
+ * DelayMate has its own (a real store asset); the rest need distinct covers —
+ * see docs/BLOCKERS.md #4.
  */
 export const caseStudies: CaseStudy[] = [
   {
@@ -30,7 +33,7 @@ export const caseStudies: CaseStudy[] = [
     role: 'Software Engineer / Technical Consultant, via Aldemis',
     stack: ['.NET', 'AWS', 'CI/CD'],
     featured: true,
-    order: 1,
+    order: 3,
 
     problem:
       'A banking application built on .NET and AWS had gone dormant. It could not be deployed, and the infrastructure and deployment faults blocking it had not been diagnosed. The platform was inherited with no handover from the team that built it.',
@@ -60,7 +63,7 @@ export const caseStudies: CaseStudy[] = [
     role: 'Software Engineer / Technical Consultant, via Aldemis',
     stack: ['Python', 'Django', 'PostgreSQL', 'AWS (Lambda, EC2, RDS)'],
     featured: true,
-    order: 2,
+    order: 4,
 
     problem:
       'The engineering team responsible for a live Django, PostgreSQL and AWS accounting platform left. The system was in production and had to keep serving users while ownership was reconstructed from the outside.',
@@ -81,41 +84,38 @@ export const caseStudies: CaseStudy[] = [
   },
 
   {
-    slug: 'freelance-fullstack-delivery',
-    title: 'Full-stack Delivery, Web and Mobile',
+    slug: 'delaymate',
+    title: 'DelayMate',
     description:
-      'Independent delivery of a web application and a mobile app, from empty repository to production.',
-    image: musicGeneratorImage,
+      'A consumer Flutter app for UK rail passengers, with automatic background journey tracking — through App Store review, launching soon.',
+    image: delaymateImage,
     kind: 'client',
-    client: 'Confidential clients, freelance',
-    period: 'Nov 2024 – May 2025',
-    role: 'Full-stack Software Engineer',
+    client: 'Aldemis — DelayMate (in-house product)',
+    period: '2025 – Present',
+    role: 'Software Engineer / Technical Consultant, via Aldemis',
     stack: [
-      'Next.js',
-      'TypeScript',
-      'Tailwind CSS',
-      'Supabase',
-      'PostgreSQL',
-      'Vercel',
       'Flutter',
-      'AWS CDK',
+      'Python',
+      'AWS Lambda',
+      'AWS Cognito',
+      'PostgreSQL (RDS)',
+      'AWS SAM',
     ],
     featured: true,
-    order: 3,
+    order: 1,
 
     problem:
-      'Clients needed working products shipped without an engineering team to build them — covering architecture, implementation, infrastructure and release.',
+      'Tracking a train journey reliably from a phone is harder than it sounds: background GPS that keeps working with the app closed, patchy connectivity on trains, and live rail data that has to be reconciled with what the phone recorded. DelayMate is a consumer product for UK rail passengers — the full product story is saved for launch.',
     approach: [
-      'Built and deployed a full-stack application in Next.js with TypeScript and Tailwind CSS, backed by Supabase with managed PostgreSQL, hosted on Vercel.',
-      'Implemented a RESTful API for edge functions and automated a CI/CD pipeline covering build, test and deployment.',
-      'Developed a mobile application in Flutter against an AWS serverless backend built with AWS CDK in Python, integrating third-party APIs.',
-      'Ran delivery end to end through Jira and Git — scoping, sequencing and shipping solo.',
+      'Built the Flutter mobile app (MVVM, Provider for state) around automatic background GPS journey tracking, including while the app is closed or the phone is offline — data stores locally and syncs when connectivity returns.',
+      'Integrated live National Rail data through a serverless AWS backend (Lambda, Cognito auth, Postgres on RDS), reconciling recorded journeys against real departure and service data.',
+      'Took the app through store submission on both platforms: App Store review and the Play Console listing, including the privacy and data-safety declarations both stores require for background location.',
     ],
     outcome: [
-      'Two products delivered to production across different platforms and cloud providers.',
-      'Infrastructure defined as code and releases automated, so neither depended on me being present.',
+      'Version 1.0 passed App Store review; the Google Play submission runs alongside it.',
+      'Real journeys are already being tracked in production ahead of the public launch.',
     ],
-    metrics: [TODO('anything measurable: users, load, delivery time, cost saved')],
+    metrics: ['588 journeys tracked in production as of Aug 2026', 'App Store v1.0 approved'],
   },
 
   {
@@ -128,8 +128,8 @@ export const caseStudies: CaseStudy[] = [
     period: '2024 – 2025',
     role: 'Sole author — data, training, inference and web delivery',
     stack: ['Python', 'PyTorch', 'Transformers', 'MidiTok', 'Django', 'React'],
-    featured: true,
-    order: 4,
+    featured: false,
+    order: 5,
 
     problem:
       'Symbolic music generation is usually demonstrated with large models and heavy inference. The dissertation asked how small a model could get and still produce retro video game music that holds together over a couple of minutes.',
@@ -169,7 +169,7 @@ export const caseStudies: CaseStudy[] = [
     role: 'Engineer on a cross-disciplinary team',
     stack: ['Python', 'Pandas', 'NumPy', 'Matplotlib'],
     featured: false,
-    order: 5,
+    order: 6,
 
     problem:
       'Electrifying domestic heating shifts load onto a transmission system that was not planned around it. The project examined what that shift does to the UK network.',
@@ -186,13 +186,13 @@ export const caseStudies: CaseStudy[] = [
     slug: 'aim-trainer',
     title: 'Aim Trainer',
     description: 'A browser aim-training game built with react-three-fiber.',
-    image: musicGeneratorImage,
+    image: aimTrainerImage,
     kind: 'personal',
     period: '2024',
     role: 'Sole author',
     stack: ['TypeScript', 'React', 'react-three-fiber', 'three.js'],
-    featured: false,
-    order: 6,
+    featured: true,
+    order: 2,
 
     problem:
       'An excuse to work with a real-time 3D render loop in React, where the constraint is that state updates must not fight the animation frame.',
