@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { ValidationError } from 'yup'
 import { contactSchema, HONEYPOT_FIELD, MIN_FILL_MS } from '@/lib/contactSchema'
+import { clientIp } from '@/lib/http'
 import { notifyDiscord, notifyEmail, type NotifyResult } from '@/lib/notify'
 
 // No-op today (nodejs is the default), kept as documentation: an HMAC-signed
@@ -9,10 +10,6 @@ import { notifyDiscord, notifyEmail, type NotifyResult } from '@/lib/notify'
 export const runtime = 'nodejs'
 
 const MAX_BODY_BYTES = 20_000
-
-function clientIp(req: Request): string {
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-}
 
 /**
  * The success response — also returned verbatim when a spam trap fires. It must

@@ -8,6 +8,7 @@ Built with Next.js 16 (App Router), React 19 and TypeScript. Deployed on Vercel.
 ```
 frontend/   the site
 ml/         standalone Python from the music-generator case study
+supabase/   schema for the aim trainer leaderboard, managed via CLI migrations
 docs/       BLOCKERS.md — what's outstanding
 ```
 
@@ -22,6 +23,11 @@ npm run dev        # http://localhost:3000
 To make the contact form reach you, follow [docs/SETUP.md](docs/SETUP.md) — a
 Discord webhook takes about two minutes and costs nothing. Everything else works
 without it; an unconfigured form still renders and offers a mailto fallback.
+
+To turn on the aim trainer's leaderboard, follow
+[docs/LEADERBOARD.md](docs/LEADERBOARD.md) — a free Supabase project, linked via
+CLI. Without it the game plays exactly the same; the leaderboard sections just
+don't render.
 
 ## Notes
 

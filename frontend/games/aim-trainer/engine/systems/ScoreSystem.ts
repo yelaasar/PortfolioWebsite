@@ -63,3 +63,14 @@ function speedBonus(reactionMs: number): number {
   const clamped = Math.min(Math.max(slowness, 0), 1)
   return Math.round(MAX_SPEED_BONUS * (1 - clamped))
 }
+
+/**
+ * The most a single hit can ever be worth — a max-speed hit earns the full
+ * bonus on top of the base. Exported so anything checking a *reported* score
+ * for plausibility (the leaderboard API route, which cannot otherwise see how
+ * this class computes points) shares the same constants instead of guessing
+ * at them from outside.
+ */
+export function maxScoreForHits(hits: number): number {
+  return hits * (BASE_POINTS + MAX_SPEED_BONUS)
+}
