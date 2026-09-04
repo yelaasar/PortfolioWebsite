@@ -101,6 +101,11 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  /* Results + leaderboard + picker + button can outgrow a short viewport now
+     that the leaderboard lives in here too — scroll the panel rather than
+     letting it spill past the stage. */
+  max-height: 90%;
+  overflow-y: auto;
 
   /* The shared CTA is a fixed 7rem, which clips a label like "Play again". */
   button {
@@ -175,4 +180,110 @@
   font-family: Courier;
   color: var(--text-color);
   opacity: 0.7;
+}
+
+.leaderboard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leaderboardTitle {
+  margin: 0;
+  font-family: Courier;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.leaderboardEmpty {
+  margin: 0;
+  font-family: Courier;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.leaderboardList {
+  width: 100%;
+  max-width: 20rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: Courier;
+  color: var(--text-color);
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.15rem 0;
+  }
+}
+
+.leaderboardRank {
+  width: 1.4rem;
+  flex-shrink: 0;
+  text-align: right;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.leaderboardName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.leaderboardScore {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--secondary-color);
+}
+
+.saveRow {
+  display: flex;
+  gap: 0.5rem;
+
+  input {
+    width: 9rem;
+    height: 2rem;
+    padding: 0 0.75rem;
+    box-sizing: border-box;
+    border-radius: 4rem;
+    border: 1px solid #fefefeaf;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+  }
+
+  button {
+    width: auto;
+    padding: 0 1rem;
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.saved {
+  margin: 0;
+  font-family: Courier;
+  color: var(--secondary-color);
+}
+
+.saveError {
+  margin: 0;
+  font-family: Courier;
+  color: #ff6b6b;
 }

@@ -38,6 +38,7 @@ There is no test suite.
 ```
 frontend/   the site. Vercel's Root Directory must be set to this.
 ml/         standalone Python, not part of any build
+supabase/   CLI-managed schema for the aim trainer leaderboard (migrations/)
 docs/       BLOCKERS.md — what's outstanding and who owns it
 ```
 
@@ -68,7 +69,7 @@ high-contrast `<mark>`, and `sitemap.ts` filters those case studies out so a
 placeholder page is never advertised to search engines. Unfilled content is
 meant to be uncomfortable to look at, not silently invisible.
 
-**Server components by default.** Only `Contact/ContactForm.tsx` and the three
+**Server components by default.** Only `Contact/ContactForm.tsx` and the four
 files under `games/aim-trainer/react/` are `'use client'`. The header nav is
 plain anchors plus `scroll-behavior: smooth` in `globals.css`, so it needs no JS.
 
@@ -81,9 +82,46 @@ its own `Scene`, renderer, rAF loop and systems. `react/` is the only bridge:
 HUD is DOM drawn over the canvas, not geometry inside it. Nothing outside the
 directory may import `engine/` internals; keep the seam at `index.ts`.
 
+The one exception to "self-contained": `react/Leaderboard.tsx` calls
+`/api/leaderboard`. That's still entirely inside the `games/aim-trainer/`
+boundary — the API route lives outside it (`app/api/leaderboard/route.ts`,
+alongside the contact route) — but it means the game is no longer literally
+zero-dependency on the rest of the site the way the engine itself is.
+
 Snapshots are quantised (`clockResolutionMs`) so the HUD re-renders ~10x a
 second rather than once per frame — putting per-frame game state in React state
 is exactly what this structure exists to prevent.
+
+**Aim trainer leaderboard → `app/api/leaderboard/route.ts` → Supabase, via the
+service_role key only.** The browser never talks to Supabase directly — no
+anon key, no RLS policies to write, because there aren't any (the migration in
+`supabase/` enables RLS with zero policies, which locks the table to every
+Postgres role except service_role). This is also what makes score validation
+real: it happens server-side, where a client can't skip it, rather than relying
+on a public key plus database rules.
+
+One leaderboard per round length (`ROUND_LENGTHS_MS` in
+`games/aim-trainer/react/roundLengths.ts` — deliberately not exported from
+`Hud.tsx`, which is a `'use client'` file with a CSS import; the API route and
+`lib/leaderboardSchema.ts` need this same list without dragging that module
+graph into a Node route). Mixing durations into one board would let a 60s round
+always beat a 15s one on time alone.
+
+The route does two checks with no genuine anti-cheat behind them, both
+documented in the route as soft:
+
+- **Plausibility bound** — `maxScoreForHits()` (exported from the engine's
+  `ScoreSystem.ts`, not reimplemented) times reported hits, plus a floor on
+  time between hits. Stops `POST {score: 999999}`, not a client that lies
+  consistently.
+- **Rate limit** — 5 submissions per 60s per HMAC-SHA256-hashed IP
+  (`LEADERBOARD_IP_HASH_SECRET` peppers the hash; the raw IP is never stored).
+  Fails closed (503) if that secret is unset, rather than hashing with an empty
+  key.
+
+Env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+`LEADERBOARD_IP_HASH_SECRET`. Setup walkthrough (linking the CLI, running the
+migration, where the dashboard keys live) is in `docs/LEADERBOARD.md`.
 
 **Contact form → `app/api/contact/route.ts` → `lib/notify.ts` → Discord and/or
 email.** The schema in `lib/contactSchema.ts` is shared by the client resolver

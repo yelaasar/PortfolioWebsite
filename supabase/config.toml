@@ -1,0 +1,10 @@
+# Supabase CLI local dev config. Schema lives in migrations/ as versioned SQL;
+# this file just tells `supabase` what to call the local stack and, once
+# `supabase link --project-ref <ref>` has been run, which hosted project
+# `supabase db push` targets. See docs/SETUP.md for the linking walkthrough.
+
+project_id = "portfolio-aim-trainer"
+
+[db]
+port = 54322
+major_version = 15

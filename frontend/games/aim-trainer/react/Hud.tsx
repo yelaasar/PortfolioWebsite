@@ -3,9 +3,8 @@
 import cta from '@/components/ui/CTAButton.module.css'
 import type { GameSnapshot } from '../engine/types'
 import styles from './aim-trainer.module.css'
-
-/** Round lengths the menu offers, in milliseconds. */
-export const ROUND_LENGTHS_MS = [15_000, 30_000, 60_000]
+import Leaderboard from './Leaderboard'
+import { ROUND_LENGTHS_MS } from './roundLengths'
 
 /** Below this the clock turns red. */
 const URGENT_MS = 5_000
@@ -16,6 +15,8 @@ interface HudProps {
   selectedDurationMs: number
   onSelectDuration: (durationMs: number) => void
   onStart: (durationMs: number) => void
+  /** The duration the round that just ended was actually played at. */
+  playedDurationMs: number
 }
 
 /**
@@ -29,6 +30,7 @@ export default function Hud({
   selectedDurationMs,
   onSelectDuration,
   onStart,
+  playedDurationMs,
 }: HudProps) {
   const { phase } = snapshot
 
@@ -76,6 +78,20 @@ export default function Hud({
           </dl>
         </>
       )}
+      <Leaderboard
+        durationMs={selectedDurationMs}
+        result={
+          phase === 'ended'
+            ? {
+                score: snapshot.score,
+                hits: snapshot.hits,
+                misses: snapshot.misses,
+                avgReactionMs: snapshot.avgReactionMs,
+                roundDurationMs: playedDurationMs,
+              }
+            : undefined
+        }
+      />
       <div className={styles.durationPicker}>
         {ROUND_LENGTHS_MS.map((ms) => (
           <button
