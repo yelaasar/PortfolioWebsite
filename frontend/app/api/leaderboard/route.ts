@@ -119,14 +119,20 @@ export async function POST(req: Request) {
     }
 
     const supabase = getSupabase()
-    if (!supabase) return NextResponse.json({ error: 'not_configured' }, { status: 503 })
+    if (!supabase) {
+      return NextResponse.json({ error: 'supabase_not_configured' }, { status: 503 })
+    }
 
     // Hashing with an empty key defeats the whole point of hashing — the
     // table would then hold something anyone could brute-force back to an IP.
     // Fail closed instead of silently doing that.
     if (!process.env.LEADERBOARD_IP_HASH_SECRET) {
+      // Both this and the branch above are "leaderboard isn't set up" to the
+      // client, but they're deliberately distinct error codes: GET only ever
+      // checks the Supabase vars, so if the leaderboard is visibly rendering
+      // at all, this is the one env var left to check.
       console.error('[leaderboard] LEADERBOARD_IP_HASH_SECRET is unset')
-      return NextResponse.json({ error: 'not_configured' }, { status: 503 })
+      return NextResponse.json({ error: 'ip_hash_secret_not_configured' }, { status: 503 })
     }
 
     const ipHash = hashIp(clientIp(req))

@@ -118,7 +118,8 @@ curl -i -X POST http://localhost:3000/api/leaderboard \
 | Status | Meaning |
 |---|---|
 | `201 {"ok":true}` | Saved |
-| `503 not_configured` | Env vars missing (Supabase, or the IP-hash secret specifically) |
+| `503 supabase_not_configured` | `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` missing — GET would also show `configured:false` |
+| `503 ip_hash_secret_not_configured` | `LEADERBOARD_IP_HASH_SECRET` missing — the two 503s are separate codes on purpose, since GET never checks this one, so it can be missing even while the board itself renders fine |
 | `400 implausible_score` | `score`/`hits` fail the plausibility bound — expected if you make the numbers up |
 | `429 rate_limited` | More than 5 submissions from this IP in the last 60s |
 
@@ -131,7 +132,7 @@ Then play the real game in a browser, save a score, and confirm it appears.
 | Symptom | Cause |
 |---|---|
 | Leaderboard sections don't render at all | Env vars not set, or not redeployed after setting them. |
-| `503 not_configured` on POST specifically, `configured:true` on GET | `LEADERBOARD_IP_HASH_SECRET` is missing — the route refuses to hash IPs with an empty key. |
+| Board shows fine (`configured:true`, possibly "No scores yet"), but Save fails with "Leaderboard isn't fully set up yet" | `LEADERBOARD_IP_HASH_SECRET` specifically is missing — GET never checks it, so the board can render while saving still 503s. Check it's set **and ticked for the environment you're testing** (e.g. Production), then redeploy. |
 | `db push` fails with "not linked" | Run `supabase link` again — the link is local to your machine, not stored in the repo. |
 | Scores don't show up after saving | Confirm you're looking at the same round-length tab you played — each duration is its own board. |
 | Works locally, sections missing on the deployed site | Variables not ticked for the environment that deployment used (Preview vs. Production). |
