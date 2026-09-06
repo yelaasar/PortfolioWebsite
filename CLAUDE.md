@@ -104,7 +104,7 @@ One leaderboard per round length (`ROUND_LENGTHS_MS` in
 `games/aim-trainer/react/roundLengths.ts` — deliberately not exported from
 `Hud.tsx`, which is a `'use client'` file with a CSS import; the API route and
 `lib/leaderboardSchema.ts` need this same list without dragging that module
-graph into a Node route). Mixing durations into one board would let a 60s round
+graph into a Node route). Mixing durations into one board would let a 30s round
 always beat a 15s one on time alone.
 
 The route does two checks with no genuine anti-cheat behind them, both

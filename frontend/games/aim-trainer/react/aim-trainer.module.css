@@ -215,6 +215,35 @@
   opacity: 0.7;
 }
 
+/* Same nested-button trick as .durationPicker above — the ".panel button"
+   rule would otherwise win. Sized down to sit under the leaderboard title. */
+.leaderboardTabs {
+  display: flex;
+  gap: 0.4rem;
+
+  button {
+    font-family: Courier;
+    font-size: 0.8rem;
+    color: var(--text-color);
+    background: transparent;
+    border: 1px solid #fefefeaf;
+    border-radius: 4rem;
+    width: auto;
+    padding: 0.15rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 150ms ease-in-out, border-color 150ms ease-in-out;
+  }
+
+  button:hover {
+    border-color: var(--secondary-color);
+  }
+
+  button.leaderboardTabSelected {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+}
+
 .leaderboardEmpty {
   margin: 0;
   font-family: Courier;
