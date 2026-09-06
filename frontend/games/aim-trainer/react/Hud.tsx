@@ -51,33 +51,50 @@ export default function Hud({
   }
 
   return (
-    <div className={styles.panel}>
-      {phase === 'idle' ? (
-        <>
-          <h1>Aim Trainer</h1>
-          <p>
-            Click the targets. They only move when you hit them — you get{' '}
-            {Math.round(selectedDurationMs / 1000)} seconds, and misses count against
-            your accuracy.
-          </p>
-        </>
-      ) : (
-        <>
-          <h1>Round over</h1>
-          <dl className={styles.results}>
-            <dt>Score</dt>
-            <dd>{snapshot.score}</dd>
-            <dt>Hits</dt>
-            <dd>{snapshot.hits}</dd>
-            <dt>Misses</dt>
-            <dd>{snapshot.misses}</dd>
-            <dt>Accuracy</dt>
-            <dd>{formatAccuracy(snapshot.accuracy)}</dd>
-            <dt>Avg. reaction</dt>
-            <dd>{snapshot.avgReactionMs}ms</dd>
-          </dl>
-        </>
-      )}
+    <div className={styles.screens}>
+      <div className={styles.panel}>
+        {phase === 'idle' ? (
+          <>
+            <h1>Aim Trainer</h1>
+            <p>
+              Click the targets. They only move when you hit them — you get{' '}
+              {Math.round(selectedDurationMs / 1000)} seconds, and misses count against
+              your accuracy.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1>Round over</h1>
+            <dl className={styles.results}>
+              <dt>Score</dt>
+              <dd>{snapshot.score}</dd>
+              <dt>Hits</dt>
+              <dd>{snapshot.hits}</dd>
+              <dt>Misses</dt>
+              <dd>{snapshot.misses}</dd>
+              <dt>Accuracy</dt>
+              <dd>{formatAccuracy(snapshot.accuracy)}</dd>
+              <dt>Avg. reaction</dt>
+              <dd>{snapshot.avgReactionMs}ms</dd>
+            </dl>
+          </>
+        )}
+        <div className={styles.durationPicker}>
+          {ROUND_LENGTHS_MS.map((ms) => (
+            <button
+              key={ms}
+              type="button"
+              className={ms === selectedDurationMs ? styles.durationOptionSelected : undefined}
+              onClick={() => onSelectDuration(ms)}
+            >
+              {ms / 1000}s
+            </button>
+          ))}
+        </div>
+        <button type="button" className={cta.cta} onClick={() => onStart(selectedDurationMs)}>
+          {phase === 'idle' ? 'Start' : 'Play again'}
+        </button>
+      </div>
       <Leaderboard
         durationMs={selectedDurationMs}
         result={
@@ -92,21 +109,6 @@ export default function Hud({
             : undefined
         }
       />
-      <div className={styles.durationPicker}>
-        {ROUND_LENGTHS_MS.map((ms) => (
-          <button
-            key={ms}
-            type="button"
-            className={ms === selectedDurationMs ? styles.durationOptionSelected : undefined}
-            onClick={() => onSelectDuration(ms)}
-          >
-            {ms / 1000}s
-          </button>
-        ))}
-      </div>
-      <button type="button" className={cta.cta} onClick={() => onStart(selectedDurationMs)}>
-        {phase === 'idle' ? 'Start' : 'Play again'}
-      </button>
     </div>
   )
 }
