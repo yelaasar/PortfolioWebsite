@@ -36,9 +36,6 @@
   position: relative;
   flex: 1;
   min-height: 0;
-  border: 1px solid #fefefeaf;
-  border-radius: 4px;
-  overflow: hidden;
   cursor: crosshair;
 }
 
@@ -90,9 +87,23 @@
   color: #ff6b6b;
 }
 
-.panel {
+/* Wraps .panel and the leaderboard box as two separate cards, stacked and
+   centered together — replaces .panel's own `margin: auto`, since now there
+   are two boxes to center as a group rather than one. */
+.screens {
   pointer-events: auto;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  /* The two boxes together can outgrow a short viewport — scroll the group
+     rather than letting it spill past the stage. */
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+.panel {
   padding: 2rem 2.5rem;
   background-color: rgba(20, 20, 20, 0.88);
   border: 1px solid #fefefeaf;
@@ -101,11 +112,6 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  /* Results + leaderboard + picker + button can outgrow a short viewport now
-     that the leaderboard lives in here too — scroll the panel rather than
-     letting it spill past the stage. */
-  max-height: 90%;
-  overflow-y: auto;
 
   /* The shared CTA is a fixed 7rem, which clips a label like "Play again". */
   button {
@@ -182,8 +188,17 @@
   opacity: 0.7;
 }
 
+/* A separate card from .panel, not nested inside it — same look, own border.
+   22rem rather than 20rem: at 20 the name input + "Save score" button wrapped
+   onto two lines. */
 .leaderboard {
+  box-sizing: border-box;
   width: 100%;
+  max-width: 22rem;
+  padding: 1.25rem 1.5rem;
+  background-color: rgba(20, 20, 20, 0.88);
+  border: 1px solid #fefefeaf;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -253,7 +268,11 @@
   gap: 0.5rem;
 
   input {
+    /* min-width, not width: shrinks to make room for the button rather than
+       squeezing "Save score" onto two lines in the narrower leaderboard box. */
     width: 9rem;
+    min-width: 0;
+    flex-shrink: 1;
     height: 2rem;
     padding: 0 0.75rem;
     box-sizing: border-box;
@@ -267,6 +286,8 @@
 
   button {
     width: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
     padding: 0 1rem;
   }
 
