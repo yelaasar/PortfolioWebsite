@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import cta from '@/components/ui/CTAButton.module.css'
 import styles from './aim-trainer.module.css'
+import { ROUND_LENGTHS_MS } from './roundLengths'
 
 const NAME_STORAGE_KEY = 'aimTrainerName'
 const MAX_NAME_LENGTH = 20
@@ -28,10 +29,9 @@ interface LeaderboardEntry {
 /**
  * What just happened, when this mounts on the results screen. Absent on idle.
  * `roundDurationMs` is the board this score is saved to — it travels with the
- * result rather than coming from `durationMs` below, because `durationMs` is
- * "which board is currently being *displayed*" and can change (the picker is
- * still live on the results screen) independently of what the round was
- * actually played at.
+ * result rather than coming from the displayed board, because the tabs below
+ * can switch the display independently of what the round was actually played
+ * at.
  */
 export interface RoundResult {
   score: number
@@ -42,7 +42,7 @@ export interface RoundResult {
 }
 
 interface LeaderboardProps {
-  /** Which board to display. */
+  /** Board to show initially — after mount the tabs own the choice. */
   durationMs: number
   result?: RoundResult
 }
@@ -53,6 +53,7 @@ interface LeaderboardProps {
  * and the submit. Nothing above it needs to know a leaderboard exists.
  */
 export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
+  const [boardDurationMs, setBoardDurationMs] = useState(durationMs)
   const [entries, setEntries] = useState<LeaderboardEntry[] | null>(null)
   const [configured, setConfigured] = useState(true)
   const [name, setName] = useState('')
@@ -73,10 +74,27 @@ export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
     }
   }, [])
 
+  // A round just ended: snap the tabs to the board that score belongs to, so
+  // the player is looking at the list their save will land on. Keyed on the
+  // duration, not `result` itself — the parent builds a fresh result object
+  // every render while the results screen is up.
+  const resultDurationMs = result?.roundDurationMs
+  useEffect(() => {
+    if (resultDurationMs !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing to a prop change, not derivable during render
+      setBoardDurationMs(resultDurationMs)
+    }
+  }, [resultDurationMs])
+
   useEffect(() => {
     let cancelled = false
 
-    fetch(`/api/leaderboard?duration=${durationMs}`)
+    // Drop the previous board's rows immediately so switching tabs shows
+    // "Loading…" rather than the old list pretending to be the new one.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting stale async state
+    setEntries(null)
+
+    fetch(`/api/leaderboard?duration=${boardDurationMs}`)
       .then((res) => res.json())
       .then((data: { configured: boolean; entries: LeaderboardEntry[] }) => {
         if (cancelled) return
@@ -90,7 +108,7 @@ export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
     return () => {
       cancelled = true
     }
-  }, [durationMs, refreshKey])
+  }, [boardDurationMs, refreshKey])
 
   if (!configured) return null
 
@@ -168,7 +186,21 @@ export default function Leaderboard({ durationMs, result }: LeaderboardProps) {
       {status === 'saved' && <p className={styles.saved}>Saved!</p>}
       {status === 'error' && <p className={styles.saveError}>{errorMessage}</p>}
 
-      <h2 className={styles.leaderboardTitle}>Leaderboard — {durationMs / 1000}s</h2>
+      <h2 className={styles.leaderboardTitle}>Leaderboard</h2>
+      <div className={styles.leaderboardTabs} role="tablist" aria-label="Leaderboard round length">
+        {ROUND_LENGTHS_MS.map((ms) => (
+          <button
+            key={ms}
+            type="button"
+            role="tab"
+            aria-selected={ms === boardDurationMs}
+            className={ms === boardDurationMs ? styles.leaderboardTabSelected : undefined}
+            onClick={() => setBoardDurationMs(ms)}
+          >
+            {ms / 1000}s
+          </button>
+        ))}
+      </div>
       {entries === null ? (
         <p className={styles.loading}>Loading…</p>
       ) : entries.length === 0 ? (

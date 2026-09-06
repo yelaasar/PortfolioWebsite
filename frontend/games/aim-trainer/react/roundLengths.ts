@@ -6,4 +6,4 @@
  * importing it from Hud.tsx would drag a whole client-component module graph
  * into a Node API route.
  */
-export const ROUND_LENGTHS_MS = [15_000, 30_000, 60_000]
+export const ROUND_LENGTHS_MS = [15_000, 30_000]
