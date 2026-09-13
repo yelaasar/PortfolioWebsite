@@ -3,9 +3,10 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  /* Was `height`. See Skills.module.css — the CV/Experience content grows
-     here in Phase 5. Renders identically while content fits. */
-  min-height: 81dvh;
+  /* Pairs with Header .container's min-height: 15dvh so header + hero fill
+     exactly one viewport and the Experience heading stays below the fold on
+     first paint. min-height (not height) so content can still grow. */
+  min-height: 85dvh;
 
   span {
     display: flex;
