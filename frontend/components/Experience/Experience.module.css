@@ -10,6 +10,11 @@
 .entries {
   display: flex;
   flex-direction: column;
+  /* .sectionTitle's 2.75rem bottom margin is shared by every section, but the
+     rendered gap is not: Work's cards add a UA h2 margin and Skills' group
+     label adds 0.5rem, while .role sets margin: 0, so Experience alone starts
+     flush and read tighter than the rest. */
+  margin-top: 1rem;
   gap: 2.5rem;
   align-self: center;
   width: 100%;

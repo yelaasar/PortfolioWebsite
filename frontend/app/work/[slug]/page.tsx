@@ -157,7 +157,7 @@ export default async function CaseStudyPage({ params }: Props) {
         )}
 
         <p className={styles.back}>
-          <Link href="/#work">← Back to work</Link>
+          <Link href="/#work">← Back to projects</Link>
         </p>
       </div>
 
